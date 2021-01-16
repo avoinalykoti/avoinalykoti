@@ -157,8 +157,8 @@
             elevation: {{ homeassistant.elevation }}
             unit_system: metric
             time_zone: Europe/Helsinki
-            external_url: {{ duckdns.domain }}
-            internal_url: {{ duckdns.domain }}
+            external_url: https://{{ duckdns.domain }}
+            internal_url: https://{{ duckdns.domain }}
 
           recorder:
             db_url: postgresql://{{postgresql_users[0].name}}:{{postgresql_users[0].password}}@localhost/{{ postgresql_databases[0].name }}
