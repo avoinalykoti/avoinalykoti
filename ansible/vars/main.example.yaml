@@ -1,0 +1,36 @@
+timezone: Europe/Helsinki
+letsencrypt_email: user@example.com
+duckdns:
+  token: duckdnstokenhere
+  domain: yourOwnDomainName.duckdns.org
+zerotier:
+  token: ZeroTierToken
+  network_id: ZeroTierNetworkId
+data_dir: "/opt/alykoti"
+installation_type: new
+homeassistant:
+  name: Älykodin nimi
+  latitude: 62.862936
+  longitude: 24.811094
+  elevation: 100
+components:
+  mosquitto: true
+  zerotier: true
+  zigbee2mqtt: true
+  codeserver: true
+  btmqttgateway: true
+  pihole: true
+  frigate: false
+  homebridge: false
+  nodered: false
+codeserver:
+  password: editorsalasana
+postgresql_databases:
+- name: home-assistant
+postgresql_users:
+- name: home-assistant
+  password: postgresqltietokantasalasana
+github:
+  repo: not
+  user: currently
+  token: used

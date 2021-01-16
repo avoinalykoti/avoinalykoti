@@ -1,0 +1,9 @@
+roles:
+- name: geerlingguy.pip
+- name: geerlingguy.docker_arm
+- name: geerlingguy.postgresql
+- name: jnv.unattended-upgrades
+- name: m4rcu5nl.zerotier-one
+
+collections:
+- name: community.general

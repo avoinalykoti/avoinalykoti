@@ -1,0 +1,23 @@
+mqtt:
+  host: localhost
+  port: 1883
+  client_id: bt-mqtt-gateway
+  availability_topic: lwt_topic
+
+manager:
+  sensor_config:
+    topic: homeassistant
+    retain: true
+  topic_subscription:
+    update_all:
+      topic: homeassistant/status
+      payload: online
+  command_timeout: 35           # Timeout for worker operations. Can be removed if the default of 35 seconds is sufficient.
+  workers:
+    ruuvitag:
+      args:
+        devices:
+          ulko: AA:BB:CC:DD:EE:FF
+          talo: 00:22:11:DD:BB:CC
+        topic_prefix: ruuvitag
+      update_interval: 10

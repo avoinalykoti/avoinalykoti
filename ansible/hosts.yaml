@@ -1,0 +1,10 @@
+rpi:
+  hosts:
+    192.168.20.126
+  vars:
+    ansible_connection: paramiko
+    ansible_python_interpreter: /usr/bin/python3
+    ansible_ssh_user: pi
+    ansible_ssh_pass: raspberry
+    ansible_ssh_extra_args: '-o StrictHostKeyChecking: no ControlMaster: no'
+    zerotier_member_description: 'Alykoti rpi'

@@ -1,0 +1,21 @@
+name: 'Gitbook publish'
+on:
+  push:
+    branches: [ main ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout action
+      uses: actions/checkout@v2
+    - name: Gitbook Action           # https://github.com/ZanderZhao/gitbook-action/releases
+      uses: ZanderZhao/gitbook-action@v1.2.4  
+      with:                                
+        token: ${{ secrets.PERSONAL_TOKEN }}
+        source_dir: opas
+        source_branch: main
+        time_zone: Europe/Helsinki
+        publish_cname: avoinalykoti.fi

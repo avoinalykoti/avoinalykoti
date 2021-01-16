@@ -1,0 +1,563 @@
+- name: Install minimal requirements for Ansible
+  hosts: rpi
+  become: true
+  gather_facts: no
+  tasks:
+    - name: install python
+      raw: apt-get -y install python python-pip python3 python3-pip python3-setuptools acl
+
+- name: Install and configure
+  hosts: rpi
+  become: true
+  vars_files:
+    - vars/main.yaml
+  tasks:
+    - name: update and upgrade
+      apt:
+        upgrade: safe
+        update_cache: yes
+        cache_valid_time: 3600
+    - name: Reboot
+      reboot:
+        reboot_timeout: 3600
+
+- hosts: rpi
+  become: true
+  vars_files:
+    - vars/main.yaml
+  vars:
+    pip_package: python3-pip
+    pip_install_packages:
+      - name: docker
+      - name: docker-compose
+    docker_users:
+      - "{{ ansible_ssh_user }}"
+    docker_install_compose: true
+    docker_install_recommends: true
+    postgres_users_no_log: false
+    zerotier_network_id: "{{ zerotier.network_id }}"
+    zerotier_api_accesstoken: "{{ zerotier.token }}"
+
+  roles:
+    - geerlingguy.pip
+    - geerlingguy.docker_arm
+    - geerlingguy.postgresql
+    - { role: m4rcu5nl.zerotier-one, 
+      when: components.zerotier }
+    - jnv.unattended-upgrades
+
+  tasks:
+    - name: Create datadir
+      file:
+        path: "{{ data_dir }}"
+        state: directory
+        owner: "{{ ansible_ssh_user }}"
+        group: docker
+        mode: ug=rwx,g=rwx,o=rx
+
+#Traefik begin
+    - name: Update duckdns ip address
+      uri:
+        url: "https://www.duckdns.org/update?domains={{ duckdns.domain }}&token={{ duckdns.token }}&ip={{ ansible_default_ipv4.address }}"
+    - name: Create traefik dir
+      file:
+        path: "{{ data_dir }}/traefik"
+        state: directory
+        owner: "{{ ansible_ssh_user }}"
+        group: docker
+        mode: ug=rwx,g=rwx,o=rx
+    - name: Save traefik.yml
+      template:
+        src: traefik.yml
+        dest: "{{ data_dir }}/traefik/"
+        owner: "{{ ansible_ssh_user }}"
+        group: docker
+        mode: ug=rwx,g=rwx,o=rx
+    - name: Save traefik-dyn.yml
+      template:
+        src: traefik-dyn.yml
+        dest: "{{ data_dir }}/traefik/"
+        owner: "{{ ansible_ssh_user }}"
+        group: docker
+        mode: ug=rwx,g=rwx,o=rx
+    - name: Remove traefik container if that exists
+      community.general.docker_container:
+        name: traefik
+        state: absent
+    - name: Create traefik container
+      community.general.docker_container:
+        name: traefik
+        image: traefik:v2.4
+        restart_policy: unless-stopped
+        container_default_behavior: no_defaults
+        # Define behavior
+        network_mode: host
+        auto_remove: no
+        detach: yes
+        interactive: no
+        paused: no
+        privileged: no
+        read_only: no
+        tty: no
+        memory: "0"
+        init: no
+        env:
+          DUCKDNS_TOKEN: "{{ duckdns.token }}"
+        volumes:
+          - "{{ data_dir }}/traefik/traefik.yml:/etc/traefik/traefik.yml"
+          - "{{ data_dir }}/traefik/traefik-dyn.yml:/etc/traefik/traefik-dyn.yml"
+          - "/var/run/docker.sock:/var/run/docker.sock"
+#Traefik end
+
+#Homeassistant begin
+    - name: Create homeassistant dir
+      file:
+        path: "{{ data_dir }}/homeassistant"
+        state: directory
+        owner: "{{ ansible_ssh_user }}"
+        group: docker
+        mode: ug=rwx,g=rwx,o=rx
+    - name: Remove home assistant container if that exists
+      community.general.docker_container:
+        name: home-assistant
+        state: absent
+    - name: Create home assistant container
+      community.general.docker_container:
+        name: home-assistant
+        image: homeassistant/raspberrypi4-homeassistant:stable
+        restart_policy: unless-stopped
+        container_default_behavior: no_defaults
+        # Define behavior
+        network_mode: host
+        auto_remove: no
+        detach: yes
+        interactive: no
+        paused: no
+        privileged: no
+        read_only: no
+        tty: no
+        memory: "0"
+        init: yes
+        env:
+          TZ: "{{ timezone }}"
+        volumes:
+          - "{{ data_dir }}/homeassistant:/config"
+    - name: Wait until home-assistant starts and creates its default configuration.yaml
+      wait_for:
+        path: "{{ data_dir }}/homeassistant/configuration.yaml"
+    - name: Add mqtt and postgresql configurations
+      blockinfile:
+        path: "{{ data_dir }}/homeassistant/configuration.yaml"
+        state: present
+        block: |
+          homeassistant:
+            name: {{ homeassistant.name }}
+            latitude: {{ homeassistant.latitude }}
+            longitude: {{ homeassistant.longitude }}
+            elevation: {{ homeassistant.elevation }}
+            unit_system: metric
+            time_zone: Europe/Helsinki
+            external_url: {{ duckdns.domain }}
+            internal_url: {{ duckdns.domain }}
+
+          recorder:
+            db_url: postgresql://{{postgresql_users[0].name}}:{{postgresql_users[0].password}}@localhost/{{ postgresql_databases[0].name }}
+            purge_keep_days: 30
+
+          mqtt:
+            broker: localhost
+            port: 1883
+            discovery: true
+
+#Homeassistant end
+
+#Mosquitto begin
+    - name: Create mosquitto dir
+      when: components.mosquitto
+      file:
+        path: "{{ data_dir }}/mosquitto"
+        state: directory
+        owner: "{{ ansible_ssh_user }}"
+        group: docker
+        mode: ug=rwx,g=rwx,o=rx
+    - name: Save mosquitto.conf
+      when: components.mosquitto
+      template:
+        src: ./templates/mosquitto.conf
+        dest: "{{ data_dir }}/mosquitto/mosquitto.conf"
+        owner: "{{ ansible_ssh_user }}"
+        group: docker
+        mode: ug=rwx,g=rwx,o=rx
+    - name: Remove mosquitto container if that exists
+      when: components.mosquitto
+      community.general.docker_container:
+        name: mosquitto
+        state: absent
+    - name: Create mosquitto container
+      when: components.mosquitto
+      community.general.docker_container:
+        name: mosquitto
+        image: eclipse-mosquitto
+        restart_policy: unless-stopped
+        container_default_behavior: no_defaults
+        # Define behavior
+        network_mode: host
+        auto_remove: no
+        detach: yes
+        interactive: no
+        paused: no
+        privileged: no
+        read_only: no
+        tty: no
+        memory: "0"
+        init: no
+        volumes:
+          - "{{ data_dir }}/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf"
+          - "{{ data_dir }}/mosquitto/data:/mosquitto/data"
+          - "{{ data_dir }}/mosquitto/log:/mosquitto/log"
+#Mosquitto begin
+
+#Zigbee2mqtt begin
+    - name: Create zigbee2mqtt dir
+      when: components.zigbee2mqtt
+      file:
+        path: "{{ data_dir }}/zigbee2mqtt"
+        state: directory
+        owner: "{{ ansible_ssh_user }}"
+        group: docker
+        mode: ug=rwx,g=rwx,o=rx
+    - name: Remove zigbee2mqtt container if that exists
+      when: components.zigbee2mqtt
+      community.general.docker_container:
+        name: zigbee2mqtt
+        state: absent
+    - name: Create zigbee2mqtt
+      when: components.zigbee2mqtt
+      community.general.docker_container:
+        name: zigbee2mqtt
+        image: koenkk/zigbee2mqtt
+        restart_policy: unless-stopped
+        container_default_behavior: no_defaults
+        # Define behavior
+        network_mode: host
+        auto_remove: no
+        detach: yes
+        interactive: no
+        paused: no
+        privileged: yes
+        read_only: no
+        tty: no
+        memory: "0"
+        init: yes
+        env:
+          TZ: "{{ timezone }}"
+        #devices:
+        #  - "/dev/ttyACM0:/dev/ttyACM0:rwm"
+        volumes:
+          - "{{ data_dir }}/zigbee2mqtt/data:/app/data"
+          - /run/udev:/run/udev:ro
+#Zigbee2mqtt end
+
+#BT-MQTT-Gateway begin
+    - name: Create bt-mqtt-gateway dir
+      when: components.btmqttgateway
+      file:
+        path: "{{ data_dir }}/bt-mqtt-gateway"
+        state: directory
+        owner: "{{ ansible_ssh_user }}"
+        group: docker
+        mode: ug=rwx,g=rwx,o=rx
+    - name: Save bt-mqtt-gateway-config.yaml
+      when: components.btmqttgateway
+      template:
+        src: ./templates/bt-mqtt-gateway-config.yaml
+        dest: "{{ data_dir }}/bt-mqtt-gateway/config.yaml"
+        owner: "{{ ansible_ssh_user }}"
+        group: docker
+        mode: ug=rwx,g=rwx,o=rx
+    - name: Remove bt-mqtt-gateway container if that exists
+      when: components.btmqttgateway
+      community.general.docker_container:
+        name: bt-mqtt-gateway
+        state: absent
+    - name: Create bt-mqtt-gateway container
+      when: components.btmqttgateway
+      community.general.docker_container:
+        name: bt-mqtt-gateway
+        image: zewelor/bt-mqtt-gateway
+        restart_policy: unless-stopped
+        container_default_behavior: no_defaults
+        # Define behavior
+        network_mode: host
+        auto_remove: no
+        detach: yes
+        interactive: no
+        paused: no
+        privileged: no
+        read_only: no
+        tty: no
+        memory: "0"
+        init: no
+        capabilities:
+          - NET_ADMIN
+          - NET_RAW
+        volumes:
+          - "{{ data_dir }}/bt-mqtt-gateway/config.yaml:/config.yaml"
+#BT-MQTT-Gateway end
+
+#code-server begin
+    - name: Create code-server dir
+      when: components.codeserver
+      file:
+        path: "{{ data_dir }}/code-server"
+        state: directory
+        owner: "{{ ansible_ssh_user }}"
+        group: docker
+        mode: ug=rwx,g=rwx,o=rx
+    - name: Remove code-server container if that exists
+      when: components.codeserver
+      community.general.docker_container:
+        name: code-server
+        state: absent
+    - name: Create code-server container
+      when: components.codeserver
+      community.general.docker_container:
+        name: code-server
+        image: ghcr.io/linuxserver/code-server
+        restart_policy: unless-stopped
+        container_default_behavior: no_defaults
+        # Define behavior
+        network_mode: host
+        auto_remove: no
+        detach: yes
+        interactive: no
+        paused: no
+        privileged: yes
+        read_only: no
+        tty: no
+        memory: "0"
+        init: no
+        env:
+          TZ: "{{ timezone }}"
+          PUID: "0"
+          PGID: "0"
+          PASSWORD: "{{ codeserver.password }}"
+        volumes:
+          - "{{ data_dir }}/code-server:/config"
+          - "{{ data_dir }}/:/opt/alykoti/"
+          - "{{ data_dir }}/traefik/traefik-dyn.yml:/etc/traefik/traefik-dyn.yml"
+#code-server end
+
+#pihole begin
+    - name: Create pihole dir
+      when: components.pihole
+      file:
+        path: "{{ data_dir }}/pihole"
+        state: directory
+        owner: "{{ ansible_ssh_user }}"
+        group: docker
+        mode: ug=rwx,g=rwx,o=rx
+    - name: Create etc/pihole dir
+      when: components.pihole
+      file:
+        path: "{{ data_dir }}/pihole/etc-pihole"
+        state: directory
+        owner: "{{ ansible_ssh_user }}"
+        group: docker
+        mode: ug=rwx,g=rwx,o=rx
+    - name: Create etc/dns-masq.d dir
+      when: components.pihole
+      file:
+        path: "{{ data_dir }}/pihole/etc-dns-masq.d"
+        state: directory
+        owner: "{{ ansible_ssh_user }}"
+        group: docker
+        mode: ug=rwx,g=rwx,o=rx
+    - name: Remove pihole container if that exists
+      when: components.pihole
+      community.general.docker_container:
+        name: pihole
+        state: absent
+    - name: Create pihole container
+      when: components.pihole
+      community.general.docker_container:
+        name: pihole
+        image: pihole/pihole:latest
+        restart_policy: unless-stopped
+        container_default_behavior: no_defaults
+        # Define behavior
+        network_mode: bridge
+        auto_remove: no
+        detach: yes
+        interactive: no
+        paused: no
+        privileged: yes
+        read_only: no
+        tty: no
+        memory: "0"
+        init: no
+        ports:
+          - "53:53/tcp"
+          - "53:53/udp"
+          - "9100:80"
+          - "9443:443"
+        env:
+          TZ: "{{ timezone }}"
+          ServerIP: "{{ ansible_default_ipv4.address }}"
+          VIRTUAL_HOST: "pihole.{{ duckdns.domain }}"
+        volumes:
+          - "{{ data_dir }}/pi-hole/etc-pihole/:/etc/pihole/"
+          - "{{ data_dir }}/pi-hole/etc-dnsmasq.d/:/etc/dnsmasq.d/"
+#pihole end
+
+#Homebridge begin
+    - name: Create homebridge dir
+      when: components.homebridge
+      file:
+        path: "{{ data_dir }}/homebridge"
+        state: directory
+        owner: "{{ ansible_ssh_user }}"
+        group: docker
+        mode: ug=rwx,g=rwx,o=rx
+    - name: Remove homebridge container if that exists
+      when: components.homebridge
+      community.general.docker_container:
+        name: homebridge
+        state: absent
+    - name: Create homebridge container
+      when: components.homebridge
+      community.general.docker_container:
+        name: homebridge
+        image: oznu/homebridge
+        restart_policy: unless-stopped
+        container_default_behavior: no_defaults
+        # Define behavior
+        network_mode: host
+        auto_remove: no
+        detach: yes
+        interactive: no
+        paused: no
+        privileged: yes
+        read_only: no
+        tty: no
+        memory: "0"
+        init: no
+        env:
+          HOMEBRIDGE_CONFIG_UI: "{{ timezone }}"
+          HOMEBRIDGE_CONFIG_UI_PORT: "8081"
+          PUID: "0"
+          PGID: "0"
+        volumes:
+          - "{{ data_dir }}/homebridge/:/homebridge" 
+#Homebridge end
+
+#Node-RED begin
+    - name: Create nodered dir
+      when: components.nodered
+      file:
+        path: "{{ data_dir }}/nodered"
+        state: directory
+        owner: "{{ ansible_ssh_user }}"
+        group: docker
+        mode: ug=rwx,g=rwx,o=rx
+    - name: Remove nodered container if that exists
+      when: components.nodered
+      community.general.docker_container:
+        name: nodered
+        state: absent
+    - name: Create nodered container
+      when: components.nodered
+      community.general.docker_container:
+        name: nodered
+        image: nodered/node-red
+        restart_policy: unless-stopped
+        container_default_behavior: no_defaults
+        # Define behavior
+        network_mode: bridge
+        auto_remove: no
+        detach: yes
+        interactive: no
+        paused: no
+        privileged: yes
+        read_only: no
+        tty: no
+        memory: "0"
+        init: no
+        ports:
+          - "1880:1880"
+        volumes:
+          - "{{ data_dir }}/nodered/:/data"
+#Node-RED end
+
+#Frigate begin
+    - name: Create frigate dir
+      when: components.frigate
+      file:
+        path: "{{ data_dir }}/frigate"
+        state: directory
+        owner: "{{ ansible_ssh_user }}"
+        group: docker
+        mode: ug=rwx,g=rwx,o=rx
+    - name: Create frigate dir
+      when: components.frigate
+      file:
+        path: "{{ data_dir }}/frigate/clips"
+        state: directory
+        owner: "{{ ansible_ssh_user }}"
+        group: docker
+        mode: ug=rwx,g=rwx,o=rx
+    - name: Create frigate dir
+      when: components.frigate
+      file:
+        path: "{{ data_dir }}/frigate/config"
+        state: directory
+        owner: "{{ ansible_ssh_user }}"
+        group: docker
+        mode: ug=rwx,g=rwx,o=rx
+    - name: Save frigate-config.yml
+      when: components.frigate
+      template:
+        src: ./templates/frigate-config.yml
+        dest: "{{ data_dir }}/frigate/config/config.yml"
+        owner: "{{ ansible_ssh_user }}"
+        group: docker
+        mode: ug=rwx,g=rwx,o=rx
+    - name: Remove frigate container if that exists
+      when: components.frigate
+      community.general.docker_container:
+        name: frigate
+        state: absent
+    - name: Create frigate container
+      when: components.frigate
+      community.general.docker_container:
+        name: frigate
+        image: blakeblackshear/frigate:stable-armv7
+        restart_policy: unless-stopped
+        container_default_behavior: no_defaults
+        # Define behavior
+        network_mode: host
+        auto_remove: no
+        detach: yes
+        interactive: no
+        paused: no
+        privileged: yes
+        read_only: no
+        tty: no
+        memory: "0"
+        init: no
+        volumes:
+          - "{{ data_dir }}/frigate/clips:/clips:rw"
+          - "{{ data_dir }}/frigate/config:/config:rw"
+          - "{{ data_dir }}/traefik/traefik.yml:/etc/traefik/traefik.yml"
+          - "{{ data_dir }}/traefik/traefik-dyn.yml:/etc/traefik/traefik-dyn.yml"
+          - "/dev/bus/usb:/dev/bus/usb"
+          - "/etc/localtime:/etc/localtime:ro"
+#Frigate end
+
+- name: Final reboot
+  hosts: rpi
+  become: true
+  tasks:
+    - name: Reboot
+      reboot:
+        reboot_timeout: 3600
