@@ -82,7 +82,7 @@ http:
     codeserver:
       loadBalancer:
         servers:
-          - url: "http://{{ ansible_default_ipv4.address }}:8081"
+          - url: "http://{{ ansible_default_ipv4.address }}:8443"
     frigate:
       loadBalancer:
         servers:
