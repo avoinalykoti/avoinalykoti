@@ -43,6 +43,7 @@ choco install -y cygwin cyg-get
 choco install -y rpi-imager vscode
 cyg-get python38 python38-pip python38-devel libffi-devel libssl-devel openssh make gcc-g++ sshpass python38-paramiko
 
+
 ```
   * Ensimmäinen rivi asentaa Chocolatey-pakettienhallinnan
   * Toinen rivi asentaa Cygwinin
@@ -217,3 +218,68 @@ Käynnistä asennusprosessi komennolla
 Asennus kestää noin 10 minuuttia. Kun asennus on päättynyt, voit kokeilla päästä selaimella DuckDNS:ään määrittelemälläsi domain-nimellä ja sieltä pitäisi vastata Home Assistant.
 
 Huom! Sertifikaatin haku voi joskus kestää. Odota rauhassa asennuksen päättymisen jälkeen 5 minuuttia.
+
+## Asennuksen jälkeen
+
+Kun asennus on valmis, pitäisi sinun päästä sisään Home Assistantiin. Määrittele käyttäjätunnus, jolla haluat jatkossa kirjautua.
+
+Mikäli haluat muokata asetustiedostoja, voit kirjautua muokkaustyökaluun osoitteella https://editor.domainisi.duckdns.org - käytä salasanaa, jonka olet määritellyt `main.yaml`-tiedostoon.
+Sinun tulee avata editorissa oikea hakemisto, oletuksena `/opt/alykoti`.
+
+Pääset muihin palveluihin seuraavilla osoitteilla:
+* https://pihole.domainisi.duckdns.org - Pihole
+* https://frigate.domainisi.duckdns.org - Frigate
+* https://traefik.domainisi.duckdns.org - Traefik
+
+### Zerotier-määritykset
+
+Zerotier mahdollistaa älykotijärjestelmääsi pääsyn myös ulkoverkosta. Asennusprosessi yhdistää Raspberry Pin määrittelemääsi Zerotier-verkkoon. Jos haluat yhteyden älykotijärjestelmääsi esimerkiksi puhelimellasi, tee seuraavasti:
+
+Zerotier-verkon reitityksen muokkaaminen:'
+1. Kirjaudu sisään Zerotier.com ja valitse oma verkkosi
+2. Tarkista Members-osiosta, että mikä on `Älykoti rpi` -laitteen `Managed IP`.
+3. Rullaa sivu ylös ja lisää uusi reitti `Add Routes`
+4. Syötä `Destination` -kenttään raspberryip/32 eli esimerkiksi `192.168.100.3/32` 
+5. Syötä `(via)` -kenttään `Älykoti rpi` -laitteen `Managed IP`
+6. Paina Submit
+
+Tämä reititys tekee sen, että kun joku laite verkossa haluaa osoitteeseen `192.168.100.3` niin se menee ensimmäisenä määrittelemällesi Raspberry Pille.
+
+1. Lataa seuraavaksi puhelimeesi sovellus Zerotier One.
+2. Syötä sen asetuksiin Zerotier-verkon id ja yhdistä verkkoon. 
+3. Hyväksy mobiililaitteesi verkkoon Zerotier.com:ssa ruksaamalla sarakkeen `Auth` ruksi päälle osiossa Members.
+
+Tämän jälkeen sinun tulisi päästä mobiililaitteella myös kotiverkkosi ulkopuolelta osoitteeseen https://domainisi.duckdns.org
+
+
+## Asennustoimien peruutus
+
+Mikäli haluat poistaa kaikki asennukset, voit tehdä sen seuraavasti:
+
+1. Kirjaudu sisään SSH:lla Raspberry Pi:lle
+2. Suorita seuraavat komennot:
+```
+docker stop zigbee2mqtt
+docker stop home-assistant
+docker stop pihole
+docker stop mosquitto
+docker stop code-server
+docker stop bt-mqtt-gateway
+docker stop frigate
+docker stop traefik
+docker stop nodered
+docker stop homebridge
+docker rm zigbee2mqtt
+docker rm home-assistant
+docker rm pihole
+docker rm mosquitto
+docker rm code-server
+docker rm bt-mqtt-gateway
+docker rm frigate
+docker rm traefik
+docker rm nodered
+docker rm homebridge
+sudo rm -rf /opt/alykoti
+```
+
+Komennot poistavat kaikki docker-kontit ja lopulta datahakemiston.

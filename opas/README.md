@@ -1,4 +1,4 @@
-# Alkusanat - PROJEKTI TYÖN ALLA
+# Alkusanat
 
 Avoin. Älykoti. Kaksi termiä, joiden on tarkoitus määrittää toisiaan.
 
