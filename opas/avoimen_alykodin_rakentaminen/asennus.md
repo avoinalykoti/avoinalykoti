@@ -6,7 +6,7 @@ Asentaminen tapahtuu yksinkertaistettuna seuraavasti:
 2. Laitetaan asentumaan asennukseen tarvittavat ohjelmistot
 3. Laitetaan latautumaan Raspbian -image massamuistille 
 3. Avataan tarvittavat [ulkoiset palvelut](avoimen_alykodin_rakentaminen/ulkoiset_palvelut.md)
-4. Muokataan `vars/main.json` tiedostoon oikeat asetukset
+4. Muokataan `vars/main.yaml` tiedostoon oikeat asetukset
 5. Kytketään massamuisti Raspberry Pi:hin ja kytketään Raspi verkkoon ja virtaan
 6. Käynnistetään asennus
 
