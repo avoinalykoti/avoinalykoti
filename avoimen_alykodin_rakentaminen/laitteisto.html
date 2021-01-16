@@ -1,0 +1,376 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>Laitteisto · GitBook</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.3">
+        
+        
+        
+    
+    <link rel="stylesheet" href="../gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="ulkoiset_palvelut.html" />
+    
+    
+    <link rel="prev" href="./" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="../">
+            
+                <a href="../">
+            
+                    
+                    Alkusanat
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="../tekniikat/">
+            
+                <a href="../tekniikat/">
+            
+                    
+                    Katsaus tekniikoihin
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="./">
+            
+                <a href="./">
+            
+                    
+                    Avoimen älykodin rakentaminen
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter active" data-level="1.3.1" data-path="laitteisto.html">
+            
+                <a href="laitteisto.html">
+            
+                    
+                    Laitteisto
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.2" data-path="ulkoiset_palvelut.html">
+            
+                <a href="ulkoiset_palvelut.html">
+            
+                    
+                    Ulkoiset palvelut
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.3" data-path="ohjelmistot.html">
+            
+                <a href="ohjelmistot.html">
+            
+                    
+                    Ohjelmistot
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.4" data-path="asennus.html">
+            
+                <a href="asennus.html">
+            
+                    
+                    Asennus
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href=".." >Laitteisto</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="laitteisto-ja-k&#xE4;ytt&#xF6;j&#xE4;rjestelm&#xE4;">Laitteisto ja k&#xE4;ytt&#xF6;j&#xE4;rjestelm&#xE4;</h1>
+<p>Laitteiston pohjana py&#xF6;rii l&#xE4;hes kokonaan avoin Raspberry Pi -minitietokone.</p>
+<p>Toimiakseen, tulee tietokoneessa olla massamuisti, eli joko muistikortti tai kiintolevy (SSD/NVMe).</p>
+<p>Muistikortteja ei suositella, koska ne ovat ensinn&#xE4;kin hitaita ja varsin usein ep&#xE4;luotettavia. Muistikortteja voi kuitenkin k&#xE4;ytt&#xE4;&#xE4; v&#xE4;liaikaiseen - esimerkiksi testaus/varalaite - k&#xE4;ytt&#xF6;&#xF6;n.</p>
+<p>Massamuisti voi olla joko erillisess&#xE4; kotelossa tai vaihtoehtoisesti kotelossa, jossa on sopiva liit&#xE4;nt&#xE4; integroituna.</p>
+<p>Laitteessa on hyv&#xE4; olla varavirtal&#xE4;hde ainakin kahdesta syyst&#xE4;:</p>
+<ul>
+<li>Jos tulee s&#xE4;hk&#xF6;katko, &#xE4;lykotij&#xE4;rjestelm&#xE4; jatkaa toimintaansa</li>
+<li>Jos tulee s&#xE4;hk&#xF6;katko, &#xE4;killinen virtojen menetys ei tuota lis&#xE4;ongelmia</li>
+</ul>
+<p>Varavirtal&#xE4;hteeksi soveltuu joko ulkoinen &quot;oikea&quot; UPS tai pieni UPS-lis&#xE4;laite Raspberry PI:hin.</p>
+<p>Zigbee-liikennett&#xE4; varten laitteeseen kytket&#xE4;&#xE4;n soveltuva USB-sovitin tarvittaessa.</p>
+<h2 id="ostoslista">Ostoslista</h2>
+<p>T&#xE4;ss&#xE4; on listattu ostoslista esimerkkikauppoineen ja noin-hintoineen.</p>
+<p>Erillisist&#xE4; komponenteista koostuva paketti, UPS-lis&#xE4;laitteella: ~160&#x20AC;</p>
+<ul>
+<li>Raspberry Pi 4 2G (tai suuremmalla muistilla varustettu): 50&#x20AC;<ul>
+<li><a href="https://shop.vadelmapii.com/tuote/raspberry-pi-4-model-b-tietokone/" target="_blank">https://shop.vadelmapii.com/tuote/raspberry-pi-4-model-b-tietokone/</a></li>
+</ul>
+</li>
+<li>UPS HAT ja siihen akut: 25&#x20AC; + 20&#x20AC;<ul>
+<li><a href="https://www.waveshare.com/ups-hat.htm" target="_blank">https://www.waveshare.com/ups-hat.htm</a></li>
+<li><a href="https://www.biltema.fi/toimisto---tekniikka/akut-ja-paristot/ladattavat-paristot/ladattava-icr18650-akku-2950-mah-2000037909" target="_blank">https://www.biltema.fi/toimisto---tekniikka/akut-ja-paristot/ladattavat-paristot/ladattava-icr18650-akku-2950-mah-2000037909</a></li>
+</ul>
+</li>
+<li>TBDT -massamuistikotelo: 35&#x20AC;<ul>
+<li><a href="https://www.amazon.com/TDBT-Enclosure-Thermal-Cooling-External/dp/B07TJT6W8K" target="_blank">https://www.amazon.com/TDBT-Enclosure-Thermal-Cooling-External/dp/B07TJT6W8K</a></li>
+</ul>
+</li>
+<li>M2 128G massamuisti: 30&#x20AC;<ul>
+<li><a href="https://www.karkkainen.com/verkkokauppa/xpg-sx6000-lite-128gb-m2-ssd-asema" target="_blank">https://www.karkkainen.com/verkkokauppa/xpg-sx6000-lite-128gb-m2-ssd-asema</a></li>
+</ul>
+</li>
+</ul>
+<p>Yhteen koteloon menev&#xE4; paketti, ilman UPS-lis&#xE4;laitetta: ~130&#x20AC;</p>
+<ul>
+<li>Raspberry Pi 4 2G (tai suuremmalla muistilla varustettu): 50&#x20AC;<ul>
+<li><a href="https://www.berrybase.de/en/raspberry-pi-co/raspberry-pi/boards/raspberry-pi-4-computer-modell-b-2gb-ram" target="_blank">https://www.berrybase.de/en/raspberry-pi-co/raspberry-pi/boards/raspberry-pi-4-computer-modell-b-2gb-ram</a></li>
+</ul>
+</li>
+<li>Virtal&#xE4;hde: 8&#x20AC;<ul>
+<li><a href="https://www.berrybase.de/en/raspberry-pi-co/raspberry-pi/power-supply/power-supply-units-for-the-socket/offizielles-raspberry-pi-usb-c-netzteil-5-1v/3-0a-eu-schwarz" target="_blank">https://www.berrybase.de/en/raspberry-pi-co/raspberry-pi/power-supply/power-supply-units-for-the-socket/offizielles-raspberry-pi-usb-c-netzteil-5-1v/3-0a-eu-schwarz</a></li>
+</ul>
+</li>
+<li>Argon ONE M.2 kotelo: 50&#x20AC;<ul>
+<li><a href="https://www.berrybase.de/en/new/argon-one-m.2-case-f-252-r-raspberry-pi-4" target="_blank">https://www.berrybase.de/en/new/argon-one-m.2-case-f-252-r-raspberry-pi-4</a></li>
+</ul>
+</li>
+<li>Massamuisti: 22&#x20AC;:<ul>
+<li><a href="https://www.berrybase.de/en/new/kingston-m.2-ssd-a400-120gb" target="_blank">https://www.berrybase.de/en/new/kingston-m.2-ssd-a400-120gb</a></li>
+</ul>
+</li>
+</ul>
+<p>Kun olet tilannut ja vastaanottanut tarvikkeet, kokoa ne. Pit&#xE4;isi olla yht&#xE4; helppoa kuin 10-palaisen palapelin kokoaminen.</p>
+<p>Zigbee-laitteen osalta suositus on ostaa joko:</p>
+<ul>
+<li>zig-zig-ah: <a href="https://www.tindie.com/stores/electrolama/" target="_blank">https://www.tindie.com/stores/electrolama/</a></li>
+<li>slaesh: <a href="https://www.tindie.com/products/slaesh/cc2652-zigbee-coordinator-or-openthread-router/" target="_blank">https://www.tindie.com/products/slaesh/cc2652-zigbee-coordinator-or-openthread-router/</a></li>
+<li>CC2538 + CC2592 - Zigbee dongle <a href="https://www.tindie.com/products/GiovanniCas/cc2538-cc2592-zigbee-dongle-zb30/" target="_blank">https://www.tindie.com/products/GiovanniCas/cc2538-cc2592-zigbee-dongle-zb30/</a></li>
+</ul>
+<h2 id="tarvittavat-muut-tarvikkeet">Tarvittavat muut tarvikkeet</h2>
+<p>Raspberry PI tulee liitt&#xE4;&#xE4; verkkoon kaapelilla. Tarvitset siis normaalin verkkokaapelin Raspberry PIn ja reitittimesi/kytkimen v&#xE4;lille.</p>
+<p>Tarvitset my&#xF6;s jonkun tietokoneen (Win/Mac/Linux), jonka kautta asennukset tehd&#xE4;&#xE4;n.</p>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="./" class="navigation navigation-prev " aria-label="Previous page: Avoimen älykodin rakentaminen">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="ulkoiset_palvelut.html" class="navigation navigation-next " aria-label="Next page: Ulkoiset palvelut">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"Laitteisto","level":"1.3.1","depth":2,"next":{"title":"Ulkoiset palvelut","level":"1.3.2","depth":2,"path":"avoimen_alykodin_rakentaminen/ulkoiset_palvelut.md","ref":"avoimen_alykodin_rakentaminen/ulkoiset_palvelut.md","articles":[]},"previous":{"title":"Avoimen älykodin rakentaminen","level":"1.3","depth":1,"path":"avoimen_alykodin_rakentaminen/README.md","ref":"avoimen_alykodin_rakentaminen/README.md","articles":[{"title":"Laitteisto","level":"1.3.1","depth":2,"path":"avoimen_alykodin_rakentaminen/laitteisto.md","ref":"avoimen_alykodin_rakentaminen/laitteisto.md","articles":[]},{"title":"Ulkoiset palvelut","level":"1.3.2","depth":2,"path":"avoimen_alykodin_rakentaminen/ulkoiset_palvelut.md","ref":"avoimen_alykodin_rakentaminen/ulkoiset_palvelut.md","articles":[]},{"title":"Ohjelmistot","level":"1.3.3","depth":2,"path":"avoimen_alykodin_rakentaminen/ohjelmistot.md","ref":"avoimen_alykodin_rakentaminen/ohjelmistot.md","articles":[]},{"title":"Asennus","level":"1.3.4","depth":2,"path":"avoimen_alykodin_rakentaminen/asennus.md","ref":"avoimen_alykodin_rakentaminen/asennus.md","articles":[]}]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"avoimen_alykodin_rakentaminen/laitteisto.md","mtime":"2021-01-16T21:39:24.725Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2021-01-16T21:39:55.761Z"},"basePath":"..","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="../gitbook/gitbook.js"></script>
+    <script src="../gitbook/theme.js"></script>
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+

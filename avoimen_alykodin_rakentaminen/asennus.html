@@ -1,0 +1,495 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>Asennus · GitBook</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.3">
+        
+        
+        
+    
+    <link rel="stylesheet" href="../gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    
+    <link rel="prev" href="ohjelmistot.html" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="../">
+            
+                <a href="../">
+            
+                    
+                    Alkusanat
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="../tekniikat/">
+            
+                <a href="../tekniikat/">
+            
+                    
+                    Katsaus tekniikoihin
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="./">
+            
+                <a href="./">
+            
+                    
+                    Avoimen älykodin rakentaminen
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.3.1" data-path="laitteisto.html">
+            
+                <a href="laitteisto.html">
+            
+                    
+                    Laitteisto
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.2" data-path="ulkoiset_palvelut.html">
+            
+                <a href="ulkoiset_palvelut.html">
+            
+                    
+                    Ulkoiset palvelut
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.3" data-path="ohjelmistot.html">
+            
+                <a href="ohjelmistot.html">
+            
+                    
+                    Ohjelmistot
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter active" data-level="1.3.4" data-path="asennus.html">
+            
+                <a href="asennus.html">
+            
+                    
+                    Asennus
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href=".." >Asennus</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="asennus">Asennus</h1>
+<p>Asentaminen tapahtuu yksinkertaistettuna seuraavasti:</p>
+<ol>
+<li>Ladataan koneelle &quot;asennustarvikepaketti&quot; ja puretaan se omalle tietokoneelle</li>
+<li>Laitetaan asentumaan asennukseen tarvittavat ohjelmistot</li>
+<li>Laitetaan latautumaan Raspbian -image massamuistille </li>
+<li>Avataan tarvittavat <a href="avoimen_alykodin_rakentaminen/ulkoiset_palvelut.md">ulkoiset palvelut</a></li>
+<li>Muokataan <code>vars/main.json</code> tiedostoon oikeat asetukset</li>
+<li>Kytket&#xE4;&#xE4;n massamuisti Raspberry Pi:hin ja kytket&#xE4;&#xE4;n Raspi verkkoon ja virtaan</li>
+<li>K&#xE4;ynnistet&#xE4;&#xE4;n asennus</li>
+</ol>
+<h2 id="asennuspaketin-lataaminen">Asennuspaketin lataaminen</h2>
+<p>Asennuspaketti l&#xF6;ytyy <a href="https://github.com/avoinalykoti/avoinalykoti" target="_blank">Githubista</a>.</p>
+<p>Paketin saa ladattua joko git-apuohjelmalla tai suoraan palvelusta klikkaamalla Code -&gt; Download ZIP.</p>
+<p>Pura paketti esimerkiksi ty&#xF6;p&#xF6;yd&#xE4;lle.</p>
+<p>Paketista tulee sek&#xE4; t&#xE4;m&#xE4; opas ett&#xE4; hakemisto <code>ansible</code>. Tuon hakemiston alla on kaikki asennukseen tarvittava.</p>
+<h2 id="asennukseen-tarvittavien-ohjelmistojen-asennus">Asennukseen tarvittavien ohjelmistojen asennus</h2>
+<p>Asennusprosessi perustuu Ansibleen, joka toimii Python -ohjelmointikielell&#xE4;. </p>
+<p>Asennukseen tarvittavien ohjelmien asennus hoituu hieman eri tavalla eri k&#xE4;ytt&#xF6;j&#xE4;rjestelmill&#xE4;.</p>
+<h3 id="windows">Windows</h3>
+<p>Windows-maailmassa tuki Ansiblelle on huono, joten siin&#xE4; joudutaan k&#xE4;ytt&#xE4;m&#xE4;&#xE4;n Cygwin-ymp&#xE4;rist&#xF6;&#xE4; apuna. Cygwin on k&#xE4;yt&#xE4;nn&#xF6;ss&#xE4; Windowsin p&#xE4;&#xE4;ll&#xE4; toimiva Linux.</p>
+<p>Mik&#xE4;li sinulla on k&#xE4;yt&#xF6;ss&#xE4; WSL (Windows Subsystem for Linux), voit seurata Linux-ohjeita.</p>
+<p>Tarvittavat ohjelmistot saadaan asennettua helpoiten Chocolatey -pakettihallintaohjelmalla. Seuraavilla ohjeilla saat asennettua kaiken tarvittavan:</p>
+<ol>
+<li>K&#xE4;ynnist&#xE4; komentokehote j&#xE4;rjestelm&#xE4;nvalvojana</li>
+<li>Kopioi ja liit&#xE4; n&#xE4;m&#xE4; komennot komentokehotteeseen</li>
+</ol>
+<pre><code>@&quot;%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe&quot; -NoProfile -InputFormat None -ExecutionPolicy Bypass -Command &quot;[System.Net.ServicePointManager]::SecurityProtocol = 3072; iex ((New-Object System.Net.WebClient).DownloadString(&apos;https://chocolatey.org/install.ps1&apos;))&quot; &amp;&amp; SET &quot;PATH=%PATH%;%ALLUSERSPROFILE%\chocolatey\bin&quot;
+choco install -y cygwin cyg-get
+choco install -y rpi-imager vscode
+cyg-get python38 python38-pip python38-devel libffi-devel libssl-devel openssh make gcc-g++ sshpass python38-paramiko
+</code></pre><ul>
+<li>Ensimm&#xE4;inen rivi asentaa Chocolatey-pakettienhallinnan</li>
+<li>Toinen rivi asentaa Cygwinin</li>
+<li>Kolmas rivi asentaa Raspberry Pi Imagerin ja VSCoden</li>
+<li>Nelj&#xE4;s rivi asentaa Cygwiniin Ansiblen vaatimat palikat<ol>
+<li>Komentojen ajamiseen menee noin 5 minuuttia</li>
+<li>T&#xE4;m&#xE4;n j&#xE4;lkeen voit k&#xE4;ynnist&#xE4;&#xE4; <code>Cygwin64 Terminal</code> -ohjelman</li>
+<li>Kun sen ikkuna aukeaa, kirjoita sinne<pre><code>pip3 install -v ansible
+</code></pre></li>
+<li>Nyt alkaa varsinainen Ansiblen asennus, se kest&#xE4;&#xE4; noin 25 minuuttia</li>
+</ol>
+</li>
+</ul>
+<p>J&#xE4;t&#xE4; kone asentamaan, voit jatkaa muita toimenpiteit&#xE4; seuraavaksi.</p>
+<h3 id="mac">Mac</h3>
+<p>Mac-j&#xE4;rjestelmiss&#xE4; on p&#xE4;&#xE4;s&#xE4;&#xE4;nt&#xF6;isesti l&#xE4;hes kaikki tarvittavat komponentit olemassa. J&#xE4;rjestelm&#xE4;&#xE4;n tulee asentaa kuitenkin kaksi apuohjelmaa, Ansible ja Paramiko. Paramiko on Python-pohjainen SSH-client.</p>
+<p>Tee asennukset seuraavasti:</p>
+<ol>
+<li>K&#xE4;ynnist&#xE4; P&#xE4;&#xE4;te (Terminal)</li>
+<li>Kirjoita p&#xE4;&#xE4;tteeseen<pre><code>pip install ansible
+pip install paramiko
+</code></pre></li>
+<li>Asennus on valmis</li>
+</ol>
+<h3 id="linux">Linux</h3>
+<p>Linuxissa tuki on hyvin pitk&#xE4;lti samanlainen kuin Mac-ymp&#xE4;rist&#xF6;ss&#xE4;. Voit tehd&#xE4; samat toimet kuin Mac-ohjeissakin.</p>
+<h2 id="raspbian--imagen-lataaminen-massamuistille">Raspbian -imagen lataaminen massamuistille</h2>
+<p>Massamuistille ladataan Raspbian -k&#xE4;ytt&#xF6;j&#xE4;rjestelm&#xE4;, joka toimii Raspberry PI:n virallisena k&#xE4;ytt&#xF6;j&#xE4;rjestelm&#xE4;n&#xE4;.</p>
+<p>K&#xE4;ytt&#xF6;j&#xE4;rjestelm&#xE4; ladataan massamuistille n&#xE4;in:</p>
+<ol>
+<li>Kytke massamuisti (SD-kortti/SSD-levy) tietokoneeseesi</li>
+<li>Lataa koneellesi Raspberry Pi Imager: <a href="https://www.raspberrypi.org/software/" target="_blank">https://www.raspberrypi.org/software/</a></li>
+<li>K&#xE4;ynnist&#xE4; Raspberry Pi Imager</li>
+<li>Valitse (Choose OS) ladattavaksi k&#xE4;ytt&#xF6;j&#xE4;rjestelm&#xE4;ksi<ul>
+<li>Raspberry Pi Os (other) --&gt; Raspberry Pi OS Lite</li>
+</ul>
+</li>
+<li>Valtse (Choose SD Card) oikea massamuisti</li>
+<li>Paina Write</li>
+</ol>
+<p>T&#xE4;ss&#xE4; vaiheessa massamuistille latautuu k&#xE4;ytt&#xF6;j&#xE4;rjestelm&#xE4;. Siin&#xE4; voi menn&#xE4; muutamia minuutteja.</p>
+<p>Kun kirjoitus on valmis, ota massamuisti irti ja kytke takaisin koneeseesi.</p>
+<p>Koneeseesi ilmestyy <code>BOOT</code>-niminen levy. Luo sinne tiedosto, esimerkiksi muistiolla, sis&#xE4;ll&#xF6;ll&#xE4; ei ole merkityst&#xE4;, mutta tiedostonimen tulee olla <code>ssh.txt</code>.</p>
+<p>T&#xE4;m&#xE4; tiedosto aktivoi SSH-palvelimen k&#xE4;ynnistyksess&#xE4;.</p>
+<h2 id="ulkoisten-palveluiden-avaaminen">Ulkoisten palveluiden avaaminen</h2>
+<p>Avataan kaksi palvelua:</p>
+<ol>
+<li>DuckDNS</li>
+<li>Zerotier</li>
+</ol>
+<h2 id="duckdns">DuckDNS</h2>
+<p>Rekister&#xF6;i DuckDNS-tili seuraavasti:</p>
+<ol>
+<li>Kirjaudu sis&#xE4;&#xE4;n haluamallasi tavalla osoitteessa <a href="https://www.duckdns.org/" target="_blank">https://www.duckdns.org/</a> </li>
+<li>Tee uusi subdomain, vaikkapa avoinalykoti.duckdns.org, laita t&#xE4;m&#xE4; osoite muistiin, t&#xE4;m&#xE4; on <code>duckdns domain</code>.</li>
+<li>Ota talteen sivun yl&#xE4;laidassa n&#xE4;kyv&#xE4; token, t&#xE4;m&#xE4; on <code>duckdns token</code></li>
+</ol>
+<h2 id="zerotier">Zerotier</h2>
+<p>Avaa itsellesi Zerotier-tunnus seuraavasti:</p>
+<ol>
+<li>Kirjaudu sis&#xE4;&#xE4;n/rekister&#xF6;idy osoitteessa <a href="https://www.zerotier.com/" target="_blank">https://www.zerotier.com/</a></li>
+<li>Tee uusi verkko (Create A network)</li>
+<li>Klikkaa verkko auki, vaihda sille nimi, jos haluat</li>
+<li>Ota Network ID yl&#xF6;s, t&#xE4;m&#xE4; on <code>zerotier network_id</code></li>
+<li>Klikkaa ylh&#xE4;&#xE4;lt&#xE4; Account</li>
+<li>Paina New Token</li>
+<li>Anna nimeksi vaikkapa Avoin &#xE4;lykoti</li>
+<li>Paina Generate</li>
+<li>Saatu token on <code>zerotier token</code></li>
+</ol>
+<h2 id="m&#xE4;&#xE4;ritystiedoston-varsmainyaml-muokkaus">M&#xE4;&#xE4;ritystiedoston <code>vars/main.yaml</code> muokkaus</h2>
+<p>Kaikki asennukseen tarvittavat tiedot m&#xE4;&#xE4;ritell&#xE4;&#xE4;n YAML-muotoisessa tiedostossa <code>vars/main.yaml</code>.</p>
+<p>Asennustarvikepaketissa ei tuota tiedostoa viel&#xE4; l&#xF6;ydy, vaan siell&#xE4; on vain <code>main.example.yaml</code> -tiedosto. Kopioi se ensin nimelle <code>main.yaml</code>.</p>
+<p>Avaa sen j&#xE4;lkeen tiedosto haluamaasi tekstieditoriin. Mik&#xE4;li et tied&#xE4;, mik&#xE4; tekstieditori sinulle soveltuu, k&#xE4;yt&#xE4; Visual Studio Codea (VS Code).</p>
+<p>Tiedostoon muokataan ainakin seuraavat tiedot:</p>
+<ul>
+<li><code>timezone</code>: Aikavy&#xF6;hyke, jos oletus ei ole sinulle oikea, katso oikea t&#xE4;&#xE4;lt&#xE4;: <a href="https://en.wikipedia.org/wiki/List_of_tz_database_time_zones" target="_blank">https://en.wikipedia.org/wiki/List_of_tz_database_time_zones</a></li>
+<li><code>letsencrypt_email</code> S&#xE4;hk&#xF6;postiosoite, johon Let&apos;s Encrypt l&#xE4;hett&#xE4;&#xE4; viesti&#xE4;, jos sertifikaatti uhkaa vanhentua</li>
+<li>DuckDNS-asetukset:<ul>
+<li><code>token</code>: Sy&#xF6;t&#xE4; t&#xE4;h&#xE4;n DuckDNS-palvelusta saamasi token</li>
+<li><code>domain</code>: Sy&#xF6;t&#xE4; t&#xE4;h&#xE4;n valitsemasi domain</li>
+</ul>
+</li>
+<li>Zerotier:<ul>
+<li><code>token</code>: Sy&#xF6;t&#xE4; t&#xE4;h&#xE4;n Zerotier-palvelusta saamasi token</li>
+<li><code>network_id</code>: Sy&#xF6;t&#xE4; t&#xE4;h&#xE4;n Zerotier-palveluun luomasi verkon id</li>
+</ul>
+</li>
+<li><code>data_dir</code>: T&#xE4;m&#xE4;n hakemiston alle asennus tekee kaikki tiedostot</li>
+<li><code>installation_type</code>: Tulevaisuudessa t&#xE4;ll&#xE4; pystyt&#xE4;&#xE4;n m&#xE4;&#xE4;ritt&#xE4;m&#xE4;&#xE4;n asennuksen tyyppi</li>
+<li>Home Assistant-asetukset:<ul>
+<li><code>name</code>: Anna &#xE4;lykodillesi nimi</li>
+<li><code>latitude</code> ja <code>longitude</code>: Kotisi koordinaatit. Home Assistant k&#xE4;ytt&#xE4;&#xE4; t&#xE4;t&#xE4; mm. s&#xE4;&#xE4;tietojen hakemiseen ja auringonnousun/laskun m&#xE4;&#xE4;ritt&#xE4;miseen. Etsi osoitteesi esimerkiksi Google Mapsista ja katso osoiterivilt&#xE4; </li>
+<li><code>elevation</code>: Kotisi korkeus merenpinnasta - t&#xE4;t&#xE4; k&#xE4;ytet&#xE4;&#xE4;n auringonnousun/laskun m&#xE4;&#xE4;ritt&#xE4;miseen my&#xF6;s.</li>
+<li>M&#xE4;&#xE4;ritetyt tiedot tallentuvat Home Assistantin <code>configuration.yaml</code> -tiedostoon, voit muuttaa niit&#xE4; my&#xF6;hemmin</li>
+</ul>
+</li>
+<li>Komponentit:<ul>
+<li>N&#xE4;m&#xE4; valinnat m&#xE4;&#xE4;ritt&#xE4;v&#xE4;t, mitk&#xE4; komponentit asennetaan. <code>true</code> kertoo, ett&#xE4; kyseinen komponentti asennetaan, <code>false</code> kertoo, ett&#xE4; sit&#xE4; ei asenneta</li>
+</ul>
+</li>
+<li>Code-server:<ul>
+<li><code>password</code>: T&#xE4;m&#xE4; m&#xE4;&#xE4;ritt&#xE4;&#xE4; salasanan, jota code-server kysyy ennenkuin p&#xE4;&#xE4;st&#xE4;&#xE4; muokkaamaan tiedostoja</li>
+</ul>
+</li>
+<li>PostgreSQL -asetukset:<ul>
+<li><code>postgresql_databases</code>/<code>name</code> m&#xE4;&#xE4;ritt&#xE4;&#xE4; tietokannan nimen</li>
+<li><code>postgresql_users</code>/<code>name</code> ja <code>password</code> m&#xE4;&#xE4;ritt&#xE4;&#xE4; mill&#xE4; k&#xE4;ytt&#xE4;j&#xE4;tunnuksilla Home Assistant p&#xE4;&#xE4;see tietokantaan </li>
+</ul>
+</li>
+<li>Github<ul>
+<li>Asetukset eiv&#xE4;t ole viel&#xE4; k&#xE4;yt&#xF6;ss&#xE4;</li>
+</ul>
+</li>
+</ul>
+<h2 id="raspberry-pin-ensimm&#xE4;inen-k&#xE4;ynnist&#xE4;minen">Raspberry PI:n ensimm&#xE4;inen k&#xE4;ynnist&#xE4;minen</h2>
+<p>Kytke massamuisti Raspberry PI:hin ja kytke laitteeseen virta.</p>
+<p>Ensimm&#xE4;isess&#xE4; k&#xE4;ynnistyksess&#xE4; voi menn&#xE4; useampia minuutteja.</p>
+<p>Laite saa verkkoon kytkeytyess&#xE4; automaattisesti (DHCP-protokollalla) IP-osoitteen. IP-osoite on numerosarja, esimerkiksi <code>192.168.100.3</code>, jolla laite l&#xF6;ytyy l&#xE4;hiverkostasi.</p>
+<p>T&#xE4;h&#xE4;n on muutamia selvitt&#xE4;mistapoja:</p>
+<ol>
+<li>Ping<ul>
+<li>K&#xE4;ynnist&#xE4; komentokehote (tai Mac:ss&#xE4; P&#xE4;&#xE4;te)</li>
+<li>Kirjoita<pre><code>ping raspberrypi
+</code></pre></li>
+<li>Mik&#xE4;li laite l&#xF6;ytyy oikealla nimell&#xE4;, vastaa laite ip-osoitteella, ota ip-osoite yl&#xF6;s</li>
+</ul>
+</li>
+<li>Reititin<ul>
+<li>Kirjaudu omaan verkkoreitittimeesi ja katso sielt&#xE4; jaetut DHCP-osoitteet</li>
+</ul>
+</li>
+</ol>
+<p>T&#xE4;ss&#xE4; vaiheessa on mahdotonta kirjoittaa ohjetta, joka selvitt&#xE4;&#xE4; t&#xE4;m&#xE4;n kohdan, muokataan ohjetta kun ongelmatilanteita tulee vastaan :)</p>
+<p>Vahva suositus on kuitenkin, ett&#xE4; laitteelle asetetaan reittimen p&#xE4;&#xE4;st&#xE4; kiinte&#xE4; IP-osoite. T&#xE4;m&#xE4; on mahdollista useimmissa reitittimiss&#xE4;.</p>
+<p>Mik&#xE4;li laite ei k&#xE4;ynnisty ollenkaan, voi laitteessa olla v&#xE4;&#xE4;r&#xE4; laitteisto-ohjelmaversio (firmware).</p>
+<p>T&#xE4;ss&#xE4; tapauksessa p&#xE4;ivityksen voi tehd&#xE4; esimerkiksi t&#xE4;ll&#xE4; ohjeella: <a href="https://www.tomshardware.com/how-to/boot-raspberry-pi-4-usb" target="_blank">https://www.tomshardware.com/how-to/boot-raspberry-pi-4-usb</a></p>
+<p>P&#xE4;ivitys vaatii yhden SD-kortin, jolta k&#xE4;ynnist&#xE4;minen tehd&#xE4;&#xE4;n ohjelmistop&#xE4;ivityksen ajaksi.</p>
+<p>Lopputuloksena on kuitenkin l&#xE4;hiverkossa kytkettyn&#xE4; oleva Raspberry PI -laite.</p>
+<h2 id="asennuksen-k&#xE4;ynnistys">Asennuksen k&#xE4;ynnistys</h2>
+<h3 id="ip-osoitteen-asettaminen">IP-osoitteen asettaminen</h3>
+<p>Aseta Raspberry PI:n ip-osoite tiedostoon <code>hosts.yaml</code>. Mik&#xE4;li k&#xE4;yt&#xE4;t muita kuin oletusk&#xE4;ytt&#xE4;j&#xE4;tunnuksia (<code>pi</code>/<code>raspberry</code>) laitteessasi, voit m&#xE4;&#xE4;ritt&#xE4;&#xE4; ne my&#xF6;s samaan tiedostoon.</p>
+<h3 id="asennuksen-k&#xE4;ynnist&#xE4;minen">Asennuksen k&#xE4;ynnist&#xE4;minen</h3>
+<p>Asennus k&#xE4;ynnistet&#xE4;&#xE4;n suorittamalla <code>start.sh</code> -komentojono <code>ansible</code>-hakemistossa.</p>
+<p>Mik&#xE4;li k&#xE4;yt&#xE4;t Windowsia, tee seuraavasti:</p>
+<ol>
+<li>K&#xE4;ynnist&#xE4; Cygwin64 Terminal</li>
+<li>Mene oikeaan hakemistoon:<ul>
+<li>Cygwin k&#xE4;sittelee hakemistoja hieman eri tavalla kuin Windows normaalisti. Mik&#xE4;li sinulla on tiedostot esimerkiksi ty&#xF6;p&#xF6;yd&#xE4;ll&#xE4; hakemistossa <code>C:\Users\K&#xE4;ytt&#xE4;j&#xE4;nimi\Desktop\avoinalykoti\ansible</code> niin kyseinen hakemisto l&#xF6;ytyy Cygwin-puolelta muodossa <code>/cygdrive/c/users/k&#xE4;ytt&#xE4;j&#xE4;nimi/desktop/avoinalykoti/ansible</code><pre><code>cd /cygdrive/c/avoinalykoti/ansible
+</code></pre></li>
+</ul>
+</li>
+</ol>
+<p>K&#xE4;ynnist&#xE4; asennusprosessi komennolla</p>
+<pre><code>./start.sh
+</code></pre><p>Asennus kest&#xE4;&#xE4; noin 10 minuuttia. Kun asennus on p&#xE4;&#xE4;ttynyt, voit kokeilla p&#xE4;&#xE4;st&#xE4; selaimella DuckDNS:&#xE4;&#xE4;n m&#xE4;&#xE4;rittelem&#xE4;ll&#xE4;si domain-nimell&#xE4; ja sielt&#xE4; pit&#xE4;isi vastata Home Assistant.</p>
+<p>Huom! Sertifikaatin haku voi joskus kest&#xE4;&#xE4;. Odota rauhassa asennuksen p&#xE4;&#xE4;ttymisen j&#xE4;lkeen 5 minuuttia.</p>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="ohjelmistot.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page: Ohjelmistot">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"Asennus","level":"1.3.4","depth":2,"previous":{"title":"Ohjelmistot","level":"1.3.3","depth":2,"path":"avoimen_alykodin_rakentaminen/ohjelmistot.md","ref":"avoimen_alykodin_rakentaminen/ohjelmistot.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"avoimen_alykodin_rakentaminen/asennus.md","mtime":"2021-01-16T21:39:24.725Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2021-01-16T21:39:55.761Z"},"basePath":"..","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="../gitbook/gitbook.js"></script>
+    <script src="../gitbook/theme.js"></script>
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+
