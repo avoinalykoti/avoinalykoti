@@ -417,6 +417,62 @@ pip install paramiko
 <pre><code>./start.sh
 </code></pre><p>Asennus kest&#xE4;&#xE4; noin 10 minuuttia. Kun asennus on p&#xE4;&#xE4;ttynyt, voit kokeilla p&#xE4;&#xE4;st&#xE4; selaimella DuckDNS:&#xE4;&#xE4;n m&#xE4;&#xE4;rittelem&#xE4;ll&#xE4;si domain-nimell&#xE4; ja sielt&#xE4; pit&#xE4;isi vastata Home Assistant.</p>
 <p>Huom! Sertifikaatin haku voi joskus kest&#xE4;&#xE4;. Odota rauhassa asennuksen p&#xE4;&#xE4;ttymisen j&#xE4;lkeen 5 minuuttia.</p>
+<h2 id="asennuksen-j&#xE4;lkeen">Asennuksen j&#xE4;lkeen</h2>
+<p>Kun asennus on valmis, pit&#xE4;isi sinun p&#xE4;&#xE4;st&#xE4; sis&#xE4;&#xE4;n Home Assistantiin. M&#xE4;&#xE4;rittele k&#xE4;ytt&#xE4;j&#xE4;tunnus, jolla haluat jatkossa kirjautua.</p>
+<p>Mik&#xE4;li haluat muokata asetustiedostoja, voit kirjautua muokkausty&#xF6;kaluun osoitteella <a href="https://editor.domainisi.duckdns.org" target="_blank">https://editor.domainisi.duckdns.org</a> - k&#xE4;yt&#xE4; salasanaa, jonka olet m&#xE4;&#xE4;ritellyt <code>main.yaml</code>-tiedostoon.
+Sinun tulee avata editorissa oikea hakemisto, oletuksena <code>/opt/alykoti</code>.</p>
+<p>P&#xE4;&#xE4;set muihin palveluihin seuraavilla osoitteilla:</p>
+<ul>
+<li><a href="https://pihole.domainisi.duckdns.org" target="_blank">https://pihole.domainisi.duckdns.org</a> - Pihole</li>
+<li><a href="https://frigate.domainisi.duckdns.org" target="_blank">https://frigate.domainisi.duckdns.org</a> - Frigate</li>
+<li><a href="https://traefik.domainisi.duckdns.org" target="_blank">https://traefik.domainisi.duckdns.org</a> - Traefik</li>
+</ul>
+<h3 id="zerotier-m&#xE4;&#xE4;ritykset">Zerotier-m&#xE4;&#xE4;ritykset</h3>
+<p>Zerotier mahdollistaa &#xE4;lykotij&#xE4;rjestelm&#xE4;&#xE4;si p&#xE4;&#xE4;syn my&#xF6;s ulkoverkosta. Asennusprosessi yhdist&#xE4;&#xE4; Raspberry Pin m&#xE4;&#xE4;rittelem&#xE4;&#xE4;si Zerotier-verkkoon. Jos haluat yhteyden &#xE4;lykotij&#xE4;rjestelm&#xE4;&#xE4;si esimerkiksi puhelimellasi, tee seuraavasti:</p>
+<p>Zerotier-verkon reitityksen muokkaaminen:&apos;</p>
+<ol>
+<li>Kirjaudu sis&#xE4;&#xE4;n Zerotier.com ja valitse oma verkkosi</li>
+<li>Tarkista Members-osiosta, ett&#xE4; mik&#xE4; on <code>&#xC4;lykoti rpi</code> -laitteen <code>Managed IP</code>.</li>
+<li>Rullaa sivu yl&#xF6;s ja lis&#xE4;&#xE4; uusi reitti <code>Add Routes</code></li>
+<li>Sy&#xF6;t&#xE4; <code>Destination</code> -kentt&#xE4;&#xE4;n raspberryip/32 eli esimerkiksi <code>192.168.100.3/32</code> </li>
+<li>Sy&#xF6;t&#xE4; <code>(via)</code> -kentt&#xE4;&#xE4;n <code>&#xC4;lykoti rpi</code> -laitteen <code>Managed IP</code></li>
+<li>Paina Submit</li>
+</ol>
+<p>T&#xE4;m&#xE4; reititys tekee sen, ett&#xE4; kun joku laite verkossa haluaa osoitteeseen <code>192.168.100.3</code> niin se menee ensimm&#xE4;isen&#xE4; m&#xE4;&#xE4;rittelem&#xE4;llesi Raspberry Pille.</p>
+<ol>
+<li>Lataa seuraavaksi puhelimeesi sovellus Zerotier One.</li>
+<li>Sy&#xF6;t&#xE4; sen asetuksiin Zerotier-verkon id ja yhdist&#xE4; verkkoon. </li>
+<li>Hyv&#xE4;ksy mobiililaitteesi verkkoon Zerotier.com:ssa ruksaamalla sarakkeen <code>Auth</code> ruksi p&#xE4;&#xE4;lle osiossa Members.</li>
+</ol>
+<p>T&#xE4;m&#xE4;n j&#xE4;lkeen sinun tulisi p&#xE4;&#xE4;st&#xE4; mobiililaitteella my&#xF6;s kotiverkkosi ulkopuolelta osoitteeseen <a href="https://domainisi.duckdns.org" target="_blank">https://domainisi.duckdns.org</a></p>
+<h2 id="asennustoimien-peruutus">Asennustoimien peruutus</h2>
+<p>Mik&#xE4;li haluat poistaa kaikki asennukset, voit tehd&#xE4; sen seuraavasti:</p>
+<ol>
+<li>Kirjaudu sis&#xE4;&#xE4;n SSH:lla Raspberry Pi:lle</li>
+<li>Suorita seuraavat komennot:<pre><code>docker stop zigbee2mqtt
+docker stop home-assistant
+docker stop pihole
+docker stop mosquitto
+docker stop code-server
+docker stop bt-mqtt-gateway
+docker stop frigate
+docker stop traefik
+docker stop nodered
+docker stop homebridge
+docker rm zigbee2mqtt
+docker rm home-assistant
+docker rm pihole
+docker rm mosquitto
+docker rm code-server
+docker rm bt-mqtt-gateway
+docker rm frigate
+docker rm traefik
+docker rm nodered
+docker rm homebridge
+sudo rm -rf /opt/alykoti
+</code></pre></li>
+</ol>
+<p>Komennot poistavat kaikki docker-kontit ja lopulta datahakemiston.</p>
 
                                 
                                 </section>
@@ -456,7 +512,7 @@ pip install paramiko
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Asennus","level":"1.3.4","depth":2,"previous":{"title":"Ohjelmistot","level":"1.3.3","depth":2,"path":"avoimen_alykodin_rakentaminen/ohjelmistot.md","ref":"avoimen_alykodin_rakentaminen/ohjelmistot.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"avoimen_alykodin_rakentaminen/asennus.md","mtime":"2021-01-16T21:52:57.808Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2021-01-16T21:53:29.209Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Asennus","level":"1.3.4","depth":2,"previous":{"title":"Ohjelmistot","level":"1.3.3","depth":2,"path":"avoimen_alykodin_rakentaminen/ohjelmistot.md","ref":"avoimen_alykodin_rakentaminen/ohjelmistot.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"avoimen_alykodin_rakentaminen/asennus.md","mtime":"2021-01-16T23:07:18.870Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2021-01-16T23:07:43.175Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
