@@ -189,11 +189,22 @@ Vahva suositus on kuitenkin, että laitteelle asetetaan reittimen päästä kiin
 
 Mikäli laite ei käynnisty ollenkaan, voi laitteessa olla väärä laitteisto-ohjelmaversio (firmware).
 
-Tässä tapauksessa päivityksen voi tehdä esimerkiksi tällä ohjeella: https://www.tomshardware.com/how-to/boot-raspberry-pi-4-usb
-
-Päivitys vaatii yhden SD-kortin, jolta käynnistäminen tehdään ohjelmistopäivityksen ajaksi.
-
 Lopputuloksena on kuitenkin lähiverkossa kytkettynä oleva Raspberry PI -laite.
+
+### USB-käynnistyksen aktivointi (ja Raspberryn firmwaren päivitys)
+
+Mikäli Raspberryssäsi on vanha firmware, ei se käynnistä automaattisesti USB-levyltä. Voit toimia silloin seuraavasti:
+
+1. Lataa Raspbian Lite-image SD-kortille
+2. Laita SD-kortti sisään Raspberryyn ja käynnistä se
+3. Aseta oikea IP-osoite hosts.yaml -tiedostoon
+4. Aja komento
+```
+./enable-usb-boot.sh
+```
+5. Odota hetki, asennus päivittää firmwaren ja käynnistää raspberryn kaksi kertaa uudestaan ja lopulta sammuttaa sen
+6. Nyt voit kytkeä USB-levyn kiinni ja jatkaa
+
 
 ## Asennuksen käynnistys
 

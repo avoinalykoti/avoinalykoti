@@ -1,0 +1,22 @@
+- name: Install and configure
+  hosts: rpi
+  gather_facts: no
+  become: true
+  tasks:
+    - name: Do apt update and full-upgrade
+      apt:
+        upgrade: full
+        update_cache: yes
+        cache_valid_time: 3600
+    - name: Reboot
+      reboot:
+        reboot_timeout: 3600
+    - name: Update raspberry eeprom
+      raw: rpi-eeprom-update -d -a
+    - name: Reboot
+      reboot:
+        reboot_timeout: 3600
+    - name: Change boot order
+      raw: raspi-config nonint do_boot_behaviour B1
+    - name: Shutting down
+      community.general.shutdown: 
