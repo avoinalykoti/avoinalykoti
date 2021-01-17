@@ -29,3 +29,7 @@ Avoin älykoti on siis parhaimmassa tapauksessa kestäviin ratkaisuihin keskitty
 Tämän palvelun tarkoituksena on kerätä tietoa laaja-alaisesti, suomen kielellä, avoimista älykotiratkaisuista.
 
 Sisältö on rakennettu FUUG ry:n avustuksella. Kiitos.
+
+Projektin liikkeellepanija on Tommi Savikko, syvälle älykodin kaninkoloihin sukeltanut IT-ammattilainen.
+
+Projektiin liittyvät yhteydenotot joko sähköpostitse hello@tommisavikko.fi tai [Githubiin](https://github.com/avoinalykoti/avoinalykoti) issueiden muodossa.
