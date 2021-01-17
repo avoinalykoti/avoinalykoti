@@ -205,6 +205,22 @@ Mikäli Raspberryssäsi on vanha firmware, ei se käynnistä automaattisesti USB
 5. Odota hetki, asennus päivittää firmwaren ja käynnistää raspberryn kaksi kertaa uudestaan ja lopulta sammuttaa sen
 6. Nyt voit kytkeä USB-levyn kiinni ja jatkaa
 
+### Kiinteän IP-osoitteen määritys
+
+Jos haluat asettaa Raspberry PI:hin itseensä kiinteän ip-osoitteen, voit tehdä sen seuraavasti:
+
+1. Määritä ensin nykyinen IP-osoite `hosts.yaml` -tiedostoon
+2. Suorita komento
+```
+./set-static-ip.sh
+```
+3. Syötä verkkosovittimen nimi, oletuksena eth0, voit jatkaa painamalla Enter
+4. Syötä uusi IP-osoite ja paina Enter
+5. Syötä reitittimen IP-osoite (gateway) ja paina Enter
+6. Syötä haluamasi nimipalvelinosoitteet (oletuksena Goolen ja Cloudflaren DNS-palvelimet) ja paina Enter
+7. Ansible-playbook vaihtaa IP-osoitteen ja käynnistää Raspberry PIn uudestaan ja päättyy, kun on saanut yhteyden uuteen IP-osoitteeseen
+8. Vaihda `hosts.yaml` tiedostoon uusi IP-osoite
+
 
 ## Asennuksen käynnistys
 
