@@ -415,6 +415,19 @@ pip install paramiko
 <li>Odota hetki, asennus p&#xE4;ivitt&#xE4;&#xE4; firmwaren ja k&#xE4;ynnist&#xE4;&#xE4; raspberryn kaksi kertaa uudestaan ja lopulta sammuttaa sen</li>
 <li>Nyt voit kytke&#xE4; USB-levyn kiinni ja jatkaa</li>
 </ol>
+<h3 id="kiinte&#xE4;n-ip-osoitteen-m&#xE4;&#xE4;ritys">Kiinte&#xE4;n IP-osoitteen m&#xE4;&#xE4;ritys</h3>
+<p>Jos haluat asettaa Raspberry PI:hin itseens&#xE4; kiinte&#xE4;n ip-osoitteen, voit tehd&#xE4; sen seuraavasti:</p>
+<ol>
+<li>M&#xE4;&#xE4;rit&#xE4; ensin nykyinen IP-osoite <code>hosts.yaml</code> -tiedostoon</li>
+<li>Suorita komento<pre><code>./set-static-ip.sh
+</code></pre></li>
+<li>Sy&#xF6;t&#xE4; verkkosovittimen nimi, oletuksena eth0, voit jatkaa painamalla Enter</li>
+<li>Sy&#xF6;t&#xE4; uusi IP-osoite ja paina Enter</li>
+<li>Sy&#xF6;t&#xE4; reitittimen IP-osoite (gateway) ja paina Enter</li>
+<li>Sy&#xF6;t&#xE4; haluamasi nimipalvelinosoitteet (oletuksena Goolen ja Cloudflaren DNS-palvelimet) ja paina Enter</li>
+<li>Ansible-playbook vaihtaa IP-osoitteen ja k&#xE4;ynnist&#xE4;&#xE4; Raspberry PIn uudestaan ja p&#xE4;&#xE4;ttyy, kun on saanut yhteyden uuteen IP-osoitteeseen</li>
+<li>Vaihda <code>hosts.yaml</code> tiedostoon uusi IP-osoite</li>
+</ol>
 <h2 id="asennuksen-k&#xE4;ynnistys">Asennuksen k&#xE4;ynnistys</h2>
 <h3 id="ip-osoitteen-asettaminen">IP-osoitteen asettaminen</h3>
 <p>Aseta Raspberry PI:n ip-osoite tiedostoon <code>hosts.yaml</code>. Mik&#xE4;li k&#xE4;yt&#xE4;t muita kuin oletusk&#xE4;ytt&#xE4;j&#xE4;tunnuksia (<code>pi</code>/<code>raspberry</code>) laitteessasi, voit m&#xE4;&#xE4;ritt&#xE4;&#xE4; ne my&#xF6;s samaan tiedostoon.</p>
@@ -528,7 +541,7 @@ sudo rm -rf /opt/alykoti
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Asennus","level":"1.3.4","depth":2,"previous":{"title":"Ohjelmistot","level":"1.3.3","depth":2,"path":"avoimen_alykodin_rakentaminen/ohjelmistot.md","ref":"avoimen_alykodin_rakentaminen/ohjelmistot.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["intopic-toc"],"pluginsConfig":{"intopic-toc":{"isCollapsed":true,"isScrollspyActive":true,"label":"In this article","maxDepth":6,"mode":"nested","selector":".markdown-section h1, .markdown-section h2, .markdown-section h3, .markdown-section h4, .markdown-section h5, .markdown-section h6","visible":true},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"avoimen_alykodin_rakentaminen/asennus.md","mtime":"2021-01-17T17:07:59.545Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2021-01-17T17:08:35.884Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Asennus","level":"1.3.4","depth":2,"previous":{"title":"Ohjelmistot","level":"1.3.3","depth":2,"path":"avoimen_alykodin_rakentaminen/ohjelmistot.md","ref":"avoimen_alykodin_rakentaminen/ohjelmistot.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["intopic-toc"],"pluginsConfig":{"intopic-toc":{"isCollapsed":true,"isScrollspyActive":true,"label":"In this article","maxDepth":6,"mode":"nested","selector":".markdown-section h1, .markdown-section h2, .markdown-section h3, .markdown-section h4, .markdown-section h5, .markdown-section h6","visible":true},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"avoimen_alykodin_rakentaminen/asennus.md","mtime":"2021-01-17T19:09:42.590Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2021-01-17T19:10:22.628Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
