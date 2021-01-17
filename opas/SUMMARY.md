@@ -1,4 +1,4 @@
-# Summary
+# Sisällysluettelo
 
 * [Alkusanat](README.md)
 * [Katsaus tekniikoihin](tekniikat/README.md)
@@ -7,5 +7,3 @@
    * [Ulkoiset palvelut](avoimen_alykodin_rakentaminen/ulkoiset_palvelut.md)
    * [Ohjelmistot](avoimen_alykodin_rakentaminen/ohjelmistot.md)
    * [Asennus](avoimen_alykodin_rakentaminen/asennus.md)
-
-
