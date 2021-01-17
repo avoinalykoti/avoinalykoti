@@ -10,6 +10,9 @@ Asentaminen tapahtuu yksinkertaistettuna seuraavasti:
 5. Kytketään massamuisti Raspberry Pi:hin ja kytketään Raspi verkkoon ja virtaan
 6. Käynnistetään asennus
 
+Asennusprosessi on käyty läpi tässä videossa:
+<iframe width="560" height="315" src="https://www.youtube.com/embed/Y8FQMXpqydo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 ## Asennuspaketin lataaminen
 
 Asennuspaketti löytyy [Githubista](https://github.com/avoinalykoti/avoinalykoti).
