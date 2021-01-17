@@ -10,6 +10,10 @@ Wifi-laitteiden huonona puolena tietoturvamielessä on se, että laitteet pääs
 
 Monet Wifi-älykotilaitteet perustuvat nykyään ESP8266 -pohjaisiin piireihin ja monessa tapauksessa laitteeseen pystytään lataamaan täysin avoimen lähdekoodin ohjelmisto (esimerkiksi ESPHome tai Tasmota).
 
+Wifi käyttää joko 2,4Ghz tai 5Ghz taajuutta. 2,4Ghz taajuus on vanhempi ja edullisimmat (ja vanhimmat) laitteet tukevat yleensä vain sitä taajuutta.
+
+5Ghz taajuus on nopeampi, mutta kantavuus on yleensä 2,4Ghz verkkoa lyhyempi.
+
 ## Zigbee
 
 Zigbee on avoimiin standardeihin perustuva tietoliikenneprotokolla, joka on nykyään äärimmäisen paljon käytetty. Liikenne kulkee 2,4Ghz taajuudella.
