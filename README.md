@@ -10,6 +10,7 @@ Suunnitelma on, että tekninen ratkaisu tulee perustumaan mitä todennäköisimm
 * Raspberry PI - avoimen lähdekoodin tietokone tarvittavine komponentteineen
 * Home Assistant - avoimen lähdekoodin älykotiohjelmisto
 * Wireguard - avoimen lähdekoodin vpn-ratkaisu
+  * Ensimmäisessä toteutuksessa toteutettiin Zerotierillä
 * Ansible - avoimen lähdekoodin asennusautomaatioratkaisu
 
 Projektissa ratkaisun tavoitteena on se, että kuka tahansa normaalein tietokoneen käyttötaidoin varustettu yksilö pystyisi ostamaan, asentamaan ja ylläpitämään omaa älykotiympäristöään, joka olisi rakennettu teknisesti kestävästi ja kestäväksi.
