@@ -69,6 +69,16 @@ http:
         domains:
           - main: "*.{{ duckdns.domain }}"
           - sans: "{{duckdns.domain}}"
+    wireguard-ui:
+      rule: "Host(`wireguard-ui.{{ duckdns.domain }}`)"
+      service: wireguard-ui
+      entrypoints:
+        - websecure
+      tls:
+        certResolver: "duckdnsresolver"
+        domains:
+          - main: "*.{{ duckdns.domain }}"
+          - sans: "{{duckdns.domain}}"
 
   services:
     httpsRedirect:
@@ -95,6 +105,11 @@ http:
       loadBalancer:
         servers:
           - url: "http://{{ ansible_default_ipv4.address }}:9100"
+    wireguard-ui:
+      loadBalancer:
+        servers:
+          - url: "http://{{ ansible_default_ipv4.address }}:8088"
+
 
   middlewares:
     httpsRedirect:

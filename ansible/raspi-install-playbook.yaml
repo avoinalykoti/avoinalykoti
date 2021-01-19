@@ -554,6 +554,105 @@
           - "/etc/localtime:/etc/localtime:ro"
 #Frigate end
 
+#Wireguard begin
+    - name: Create Wireguard dir
+      when: components.wireguard
+      file:
+        path: "{{ data_dir }}/wireguard"
+        state: directory
+        owner: "{{ ansible_ssh_user }}"
+        group: docker
+        mode: ug=rwx,g=rwx,o=rx
+    - name: Remove wireguard container if that exists
+      when: components.wireguard
+      community.general.docker_container:
+        name: wireguard
+        state: absent
+    - name: Create wireguard container
+      when: components.wireguard
+      community.general.docker_container:
+        name: wireguard
+        image: ghcr.io/linuxserver/wireguard
+        restart_policy: unless-stopped
+        container_default_behavior: no_defaults
+        # Define behavior
+        network_mode: bridge
+        auto_remove: no
+        detach: yes
+        interactive: no
+        paused: no
+        privileged: yes
+        read_only: no
+        tty: no
+        memory: "0"
+        init: no
+        ports:
+          - "51820:51820/udp"
+        env:
+          PUID: "0"
+          PGID: "0"
+          TZ: "{{ timezone }}"
+          SERVERURL: "wireguard.{{ duckdns.domain }}"
+        capabilities:
+          - NET_ADMIN
+          - SYS_MODULE
+        sysctls:
+          net.ipv4.conf.all.src_valid_mark: 1
+        volumes:
+          - "{{ data_dir }}/wireguard:/config"
+          - "/lib/modules:/lib/modules"
+#wireguard end
+
+
+#wg-ui begin
+    - name: Create wg-ui dir
+      when: components.wireguard
+      file:
+        path: "{{ data_dir }}/wireguard-ui"
+        state: directory
+        owner: "{{ ansible_ssh_user }}"
+        group: docker
+        mode: ug=rwx,g=rwx,o=rx
+    - name: Remove wg-ui container if that exists
+      when: components.wireguard
+      community.general.docker_container:
+        name: wg-ui
+        state: absent
+    - name: Create wg-ui container
+      when: components.wireguard
+      community.general.docker_container:
+        name: wg-ui
+        image: embarkstudios/wireguard-ui:latest
+        restart_policy: unless-stopped
+        container_default_behavior: no_defaults
+        # Define behavior
+        network_mode: bridge
+        auto_remove: no
+        detach: yes
+        interactive: no
+        paused: no
+        privileged: yes
+        read_only: no
+        tty: no
+        memory: "0"
+        init: no
+        ports:
+          - "5555:5555"
+          - "8088:8080"
+        env:
+          PUID: "0"
+          PGID: "0"
+          TZ: "{{ timezone }}"
+          SERVERURL: "wireguard.{{ duckdns.domain }}"
+        entrypoint:
+          - "/wireguard-ui"
+        sysctls:
+          net.ipv4.conf.all.src_valid_mark: 1
+        volumes:
+          - "{{ data_dir }}/wireguard-ui:/data"
+
+#wg-ui end
+
 - name: Final reboot
   hosts: rpi
   become: true

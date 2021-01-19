@@ -14,8 +14,8 @@ homeassistant:
   longitude: 24.811094
   elevation: 100
 components:
-  mosquitto: true
-  zerotier: true
+  mosquitto: false
+  zerotier: false
   zigbee2mqtt: true
   codeserver: true
   btmqttgateway: true
@@ -23,8 +23,11 @@ components:
   frigate: false
   homebridge: false
   nodered: false
+  wireguard: true
 codeserver:
   password: editorsalasana
+
+
 postgresql_databases:
 - name: home-assistant
 postgresql_users:
