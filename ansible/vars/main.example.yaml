@@ -27,7 +27,7 @@ components:
 codeserver:
   password: editorsalasana
 backup:
-  target: b2 #Only Backblaze B2 supported for now
+  target: b2 # Only Backblaze B2 supported for now
   b2:
     account: backblazeAccountID
     key: backblazeApplicationKey

@@ -76,20 +76,16 @@
         group: root
         mode: ug=rwx,g=rwx,o=rx
 
-    - name: Restore backup
-      ansible.builtin.cron:
-        name: "check dirs"
-        minute: "0"
-        hour: "*/{{"
-        job: "/root/backup.sh"
-      when:
-        - installation_type == 'restore'
+    # - name: Restore backup
+    #
+    #   when:
+    #     - installation_type == 'restore'
 
     - name: Schedule backup
       ansible.builtin.cron:
         name: "backup alykoti to {{ backup.target }}"
         minute: "0"
-        hour: "*/{{"
+        hour: "*/{{ backup.backup_interval }}"
         job: "/root/backup.sh"
       when:
         - components.backup
