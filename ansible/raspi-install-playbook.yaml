@@ -37,13 +37,25 @@
     postgres_users_no_log: false
     zerotier_network_id: "{{ zerotier.network_id }}"
     zerotier_api_accesstoken: "{{ zerotier.token }}"
+    rclone_configs:
+      - name: "{{ backup.target }}"
+        properties:
+          type: "{{ backup.target }}"
+          account: "{{ backup.b2.account }}"
+          key: "{{ backup.b2.key }}"
+      - name: "crypted{{ backup.target }}"
+        properties:
+          type: crypt
+          remote: "{{ backup.target }}:/{{backup.b2.bucket_name}}"
+          filename_encryption: standard
+          password: "{{backup.crypt_password}}"
 
   roles:
     - geerlingguy.pip
     - geerlingguy.docker_arm
     - geerlingguy.postgresql
-    - { role: m4rcu5nl.zerotier-one, 
-      when: components.zerotier }
+    - { role: m4rcu5nl.zerotier-one, when: components.zerotier }
+    - { role: stefangweichinger.ansible_rclone, when: components.backup }
     - jnv.unattended-upgrades
 
   tasks:
@@ -55,7 +67,35 @@
         group: docker
         mode: ug=rwx,g=rwx,o=rx
 
-#Traefik begin
+    #Backup begin
+    - name: Backup script
+      template:
+        src: backup.sh
+        dest: "/root/"
+        owner: root
+        group: root
+        mode: ug=rwx,g=rwx,o=rx
+
+    - name: Restore backup
+      ansible.builtin.cron:
+        name: "check dirs"
+        minute: "0"
+        hour: "*/{{"
+        job: "/root/backup.sh"
+      when:
+        - installation_type == 'restore'
+
+    - name: Schedule backup
+      ansible.builtin.cron:
+        name: "backup alykoti to {{ backup.target }}"
+        minute: "0"
+        hour: "*/{{"
+        job: "/root/backup.sh"
+      when:
+        - components.backup
+    #Backup end
+
+    #Traefik begin
     - name: Update duckdns ip address
       uri:
         url: "https://www.duckdns.org/update?domains={{ duckdns.domain }}&token={{ duckdns.token }}&ip={{ ansible_default_ipv4.address }}"
@@ -107,9 +147,9 @@
           - "{{ data_dir }}/traefik/traefik.yml:/etc/traefik/traefik.yml"
           - "{{ data_dir }}/traefik/traefik-dyn.yml:/etc/traefik/traefik-dyn.yml"
           - "/var/run/docker.sock:/var/run/docker.sock"
-#Traefik end
+    #Traefik end
 
-#Homeassistant begin
+    #Homeassistant begin
     - name: Create homeassistant dir
       file:
         path: "{{ data_dir }}/homeassistant"
@@ -169,9 +209,9 @@
             port: 1883
             discovery: true
 
-#Homeassistant end
+    #Homeassistant end
 
-#Mosquitto begin
+    #Mosquitto begin
     - name: Create mosquitto dir
       when: components.mosquitto
       file:
@@ -215,9 +255,9 @@
           - "{{ data_dir }}/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf"
           - "{{ data_dir }}/mosquitto/data:/mosquitto/data"
           - "{{ data_dir }}/mosquitto/log:/mosquitto/log"
-#Mosquitto begin
+    #Mosquitto begin
 
-#Zigbee2mqtt begin
+    #Zigbee2mqtt begin
     - name: Create zigbee2mqtt dir
       when: components.zigbee2mqtt
       file:
@@ -256,9 +296,9 @@
         volumes:
           - "{{ data_dir }}/zigbee2mqtt/data:/app/data"
           - /run/udev:/run/udev:ro
-#Zigbee2mqtt end
+    #Zigbee2mqtt end
 
-#BT-MQTT-Gateway begin
+    #BT-MQTT-Gateway begin
     - name: Create bt-mqtt-gateway dir
       when: components.btmqttgateway
       file:
@@ -303,9 +343,9 @@
           - NET_RAW
         volumes:
           - "{{ data_dir }}/bt-mqtt-gateway/config.yaml:/config.yaml"
-#BT-MQTT-Gateway end
+    #BT-MQTT-Gateway end
 
-#code-server begin
+    #code-server begin
     - name: Create code-server dir
       when: components.codeserver
       file:
@@ -346,9 +386,9 @@
           - "{{ data_dir }}/code-server:/config"
           - "{{ data_dir }}/:/opt/alykoti/"
           - "{{ data_dir }}/traefik/traefik-dyn.yml:/etc/traefik/traefik-dyn.yml"
-#code-server end
+    #code-server end
 
-#pihole begin
+    #pihole begin
     - name: Create pihole dir
       when: components.pihole
       file:
@@ -408,9 +448,9 @@
         volumes:
           - "{{ data_dir }}/pi-hole/etc-pihole/:/etc/pihole/"
           - "{{ data_dir }}/pi-hole/etc-dnsmasq.d/:/etc/dnsmasq.d/"
-#pihole end
+    #pihole end
 
-#Homebridge begin
+    #Homebridge begin
     - name: Create homebridge dir
       when: components.homebridge
       file:
@@ -448,10 +488,10 @@
           PUID: "0"
           PGID: "0"
         volumes:
-          - "{{ data_dir }}/homebridge/:/homebridge" 
-#Homebridge end
+          - "{{ data_dir }}/homebridge/:/homebridge"
+    #Homebridge end
 
-#Node-RED begin
+    #Node-RED begin
     - name: Create nodered dir
       when: components.nodered
       file:
@@ -487,9 +527,9 @@
           - "1880:1880"
         volumes:
           - "{{ data_dir }}/nodered/:/data"
-#Node-RED end
+    #Node-RED end
 
-#Frigate begin
+    #Frigate begin
     - name: Create frigate dir
       when: components.frigate
       file:

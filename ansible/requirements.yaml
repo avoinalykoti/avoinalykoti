@@ -4,6 +4,7 @@ roles:
 - name: geerlingguy.postgresql
 - name: jnv.unattended-upgrades
 - name: m4rcu5nl.zerotier-one
+- name: stefangweichinger.ansible_rclone
 
 collections:
 - name: community.general

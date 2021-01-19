@@ -23,13 +23,22 @@ components:
   frigate: false
   homebridge: false
   nodered: false
+  backup: true
 codeserver:
   password: editorsalasana
+backup:
+  target: b2 #Only Backblaze B2 supported for now
+  b2:
+    account: backblazeAccountID
+    key: backblazeApplicationKey
+    bucket_name: backblazeBucketName
+  crypt_password: secretPasswordForCryptingTheBackup
+  backup_interval: 12 # hours
 postgresql_databases:
-- name: home-assistant
+  - name: home-assistant
 postgresql_users:
-- name: home-assistant
-  password: postgresqltietokantasalasana
+  - name: home-assistant
+    password: postgresqltietokantasalasana
 github:
   repo: not
   user: currently
