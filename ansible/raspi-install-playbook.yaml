@@ -18,8 +18,10 @@
         update_cache: yes
         cache_valid_time: 3600
     - name: Reboot
-      reboot:
-        reboot_timeout: 3600
+      shell: nohup bash -c "/bin/sleep 5 && /sbin/shutdown -r now" &
+      become: true
+    - name: Wait 
+      wait_for_connection: timeout=300 delay=30
 
 - hosts: rpi
   become: true
@@ -559,5 +561,7 @@
   become: true
   tasks:
     - name: Reboot
-      reboot:
-        reboot_timeout: 3600
+      shell: nohup bash -c "/bin/sleep 5 && /sbin/shutdown -r now" &
+      become: true
+    - name: Wait 
+      wait_for_connection: timeout=300 delay=30
