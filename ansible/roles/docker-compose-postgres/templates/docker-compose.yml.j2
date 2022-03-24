@@ -1,8 +1,8 @@
-version: '3'
+version: '3.8'
 services:
   postgres:
     container_name: postgres
-    image: postgres:11.1
+    image: postgres:14.2-bullseye
     restart: always
     networks:
       - smarthome
