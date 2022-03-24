@@ -16,6 +16,9 @@ entryPoints:
         - secureHeaders@file
       tls:
         certResolver: letsencrypt
+        domains:
+          - main: "*.{{ duckdns.domain }}"
+          - sans: "{{duckdns.domain}}"
 
   mqtt:
     address: :1883
