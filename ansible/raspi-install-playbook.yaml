@@ -168,8 +168,7 @@
           http:
             use_x_forwarded_for: true
             trusted_proxies:
-              - 127.0.0.1
-              - {{ ansible_default_ipv4.address }}
+              - 172.16.0.0/12 # docker network
 
     - name: Restart home-assistant
       raw: "docker restart home-assistant"
