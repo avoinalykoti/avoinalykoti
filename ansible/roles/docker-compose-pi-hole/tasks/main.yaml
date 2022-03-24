@@ -24,3 +24,16 @@
 - name: Deploy pi-hole
   docker_compose:
     project_src: "{{ data_dir }}/pi-hole"
+
+- name: Wait until pi-hole has started and created dnsmasq.d configuration file
+  wait_for:
+    path: "{{ data_dir }}/pi-hole/etc/dnsmasq.d/01-pihole.conf"
+
+- name: Create dnsmasq conf to make duckdns domain work without connection to external dns
+  copy:
+    content: "address=/{{duckdns.domain}}/{{ ansible_default_ipv4.address }}"
+    dest: "{{ data_dir }}/pi-hole/etc/dnsmasq.d/99-smarthome.conf"
+    force: no
+    owner: "{{ ansible_ssh_user }}"
+    group: docker
+    mode: ug+rw
