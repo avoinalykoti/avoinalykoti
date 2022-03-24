@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  traefik:
+    image: traefik:latest
+    container_name: traefik
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - smarthome
+    ports:
+      - 80:80     # normal http, redirects to https
+      - 443:443   # https
+      - 1883:1883 # insecure mqtt
+      - 5432:5432 # postgres
+      - 8883:8883 # secure mqtt
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - {{ data_dir }}/traefik/data/traefik.yml:/traefik.yml:ro
+      - {{ data_dir }}/traefik/data/acme.json:/acme.json
+      - {{ data_dir }}/traefik/data/configurations:/configurations
+    environment:
+      DUCKDNS_TOKEN: "{{ duckdns.token }}"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=smarthome"
+      - "traefik.http.routers.traefik-secure.entrypoints=websecure"
+      - "traefik.http.routers.traefik-secure.rule=Host(`traefik.{{ duckdns.domain }}`)"
+      - "traefik.http.routers.traefik-secure.service=api@internal"
+
+networks:
+  smarthome:
+    name: smarthome
+    external: true

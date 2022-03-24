@@ -1,0 +1,24 @@
+# roles/docker-compose-home-assistant/tasks/main.yaml
+---
+
+- name: Create home-assistant dirs
+  file:
+    path: "{{ data_dir }}/{{item}}"
+    state: directory
+    owner: "{{ ansible_ssh_user }}"
+    group: docker
+    mode: ug+rw,g+s
+  loop:
+   - home-assistant
+   - home-assistant/config
+- name: Generate docker-compose.yml
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ data_dir }}/home-assistant/docker-compose.yml"
+    owner: "{{ ansible_ssh_user }}"
+    group: docker
+    mode: ug+rw
+    force: no
+- name: Deploy home-assistant
+  docker_compose:
+    project_src: "{{ data_dir }}/home-assistant"

@@ -1,17 +1,44 @@
+
+
 - name: Install minimal requirements for Ansible
-  hosts: rpi
+  hosts: alykoti_server
   become: true
   gather_facts: no
   tasks:
-    - name: install python
-      raw: apt-get -y install python python-pip python3 python3-pip python3-setuptools acl
+    - name: Allow sudo without password asking (to make things easier for Ansible)..
+      lineinfile:
+        path: /etc/sudoers
+        state: present
+        regexp: '^%sudo'
+        line: '%sudo ALL=(ALL) NOPASSWD: ALL'
+        validate: 'visudo -cf %s'
+    - name: Install some useful stuff
+      raw: apt-get -y install python python3 python3-pip python3-setuptools acl unzip postgresql-client
 
 - name: Install and configure
-  hosts: rpi
+  hosts: alykoti_server
   become: true
   vars_files:
     - vars/main.yaml
   tasks:
+    - name: Set timezone
+      community.general.timezone:
+        name: "{{ timezone }}"
+    - name: Disable the systemd-resolve stub DNS resolver..
+      when: components.pihole
+      lineinfile:
+        dest: /etc/systemd/resolved.conf
+        regexp: '^#DNSStubListener='
+        line: 'DNSStubListener=no'
+        state: present
+    - name: Link resolv.conf to follow netplan (router provided DNS)..
+      raw: "rm /etc/resolv.conf && ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf"
+      when: components.pihole
+    - name: Restart systemd-resolved..
+      when: components.pihole
+      ansible.builtin.service:
+        name: systemd-resolved
+        state: restarted
     - name: update and upgrade
       apt:
         upgrade: safe
@@ -23,7 +50,8 @@
     - name: Wait 
       wait_for_connection: timeout=300 delay=30
 
-- hosts: rpi
+- name: Install stuff which is running locally on host
+  hosts: alykoti_server
   become: true
   vars_files:
     - vars/main.yaml
@@ -36,120 +64,91 @@
       - "{{ ansible_ssh_user }}"
     docker_install_compose: true
     docker_install_recommends: true
-    postgres_users_no_log: false
-    zerotier_network_id: "{{ zerotier.network_id }}"
-    zerotier_api_accesstoken: "{{ zerotier.token }}"
 
   roles:
+    - { role: install-edgetpu, 
+      when: frigate.edgetpu=='pci' }
+
     - geerlingguy.pip
-    - geerlingguy.docker_arm
-    - geerlingguy.postgresql
-    - { role: m4rcu5nl.zerotier-one, 
-      when: components.zerotier }
+    - geerlingguy.docker
     - jnv.unattended-upgrades
+    - role: m3nu.ansible_role_borgbackup
+      borg_encryption_passphrase: "{{ borg.encryption_passphrase }}"
+      borg_repository: "{{ borg.repository }}"
+      # this could add new repo, but there is currently something wrong with this role:
+      # https://github.com/borgbase/ansible-role-borgbackup/issues/83
+      # create_repo: true
+      # bb_token: "{{ borg.bb_token}}"
+      # bb_region: "{{ borg.bb_region}}"
+      # bb_quota: "{{ borg.bb_quota}}"
+      # bb_quota_size: "{{ borg.bb_quota_size}}"
+      # bb_repo_name: "{{ borg.bb_repo_name}}"
+      borg_source_directories:
+        - "{{ data_dir }}"
+      borg_exclude_patterns:
+        - /opt/alykoti/frigate/media
+      borg_retention_policy:
+        keep_hourly: 3
+        keep_daily: 7
+        keep_weekly: 4
+        keep_monthly: 6
+      borgmatic_hooks:
+        before_backup:
+        - echo "`date` - Starting backup."
+        postgresql_databases:
+        - name: "{{ postgresql_databases[0].name }}"
+          username: "{{ postgresql_users[0].name }}" 
+          password: "{{ postgresql_users[0].password }}" 
+          options: "-h 127.0.0.1"
+
 
   tasks:
+    - name: Reminder to add ssh key to borgbase.com
+      pause:
+        prompt: "Open https://www.borgbase.com/account , add ssh key (visible above) there. Press Enter when ready."
+    - name: Reminder to add ssh key to borgbase.com
+      pause:
+        prompt: "Open https://www.borgbase.com/repositories , edit your repository {{ borg.bb_repo_name }}, add ssh key to \"Append-Only Access\". Press Enter when ready. "
+    - name: accept borgbase ssh fingerprint
+      shell: ssh-keyscan -H {{ borg.host }} >> ~/.ssh/known_hosts
+    - name: Init borg repo
+      raw: borgmatic init --encryption repokey-blake2
     - name: Create datadir
       file:
         path: "{{ data_dir }}"
         state: directory
         owner: "{{ ansible_ssh_user }}"
         group: docker
-        mode: ug=rwx,g=rwx,o=rx
+        mode: ug+rw,g+s
 
-#Traefik begin
-    - name: Update duckdns ip address
-      uri:
-        url: "https://www.duckdns.org/update?domains={{ duckdns.domain }}&token={{ duckdns.token }}&ip={{ ansible_default_ipv4.address }}"
-    - name: Create traefik dir
-      file:
-        path: "{{ data_dir }}/traefik"
-        state: directory
-        owner: "{{ ansible_ssh_user }}"
-        group: docker
-        mode: ug=rwx,g=rwx,o=rx
-    - name: Save traefik.yml
-      template:
-        src: traefik.yml
-        dest: "{{ data_dir }}/traefik/"
-        owner: "{{ ansible_ssh_user }}"
-        group: docker
-        mode: ug=rwx,g=rwx,o=rx
-    - name: Save traefik-dyn.yml
-      template:
-        src: traefik-dyn.yml
-        dest: "{{ data_dir }}/traefik/"
-        owner: "{{ ansible_ssh_user }}"
-        group: docker
-        mode: ug=rwx,g=rwx,o=rx
-    - name: Remove traefik container if that exists
-      community.general.docker_container:
-        name: traefik
-        state: absent
-    - name: Create traefik container
-      community.general.docker_container:
-        name: traefik
-        image: traefik:v2.4
-        restart_policy: unless-stopped
-        container_default_behavior: no_defaults
-        # Define behavior
-        network_mode: host
-        auto_remove: no
-        detach: yes
-        interactive: no
-        paused: no
-        privileged: no
-        read_only: no
-        tty: no
-        memory: "0"
-        init: no
-        env:
-          DUCKDNS_TOKEN: "{{ duckdns.token }}"
-        volumes:
-          - "{{ data_dir }}/traefik/traefik.yml:/etc/traefik/traefik.yml"
-          - "{{ data_dir }}/traefik/traefik-dyn.yml:/etc/traefik/traefik-dyn.yml"
-          - "/var/run/docker.sock:/var/run/docker.sock"
-#Traefik end
 
+- name: Install containers
+  hosts: alykoti_server
+  become: true
+  vars_files:
+    - vars/main.yaml
+  roles:
+    - docker-compose-traefik
+    - docker-compose-frigate
+    - docker-compose-mosquitto
+    - docker-compose-bt-mqtt-gateway
+    - docker-compose-code-server
+    - docker-compose-zigbee2mqtt
+    - docker-compose-pi-hole
+    - docker-compose-portainer
+    - docker-compose-home-assistant
+    - docker-compose-postgres
+
+  tasks:
 #Homeassistant begin
-    - name: Create homeassistant dir
-      file:
-        path: "{{ data_dir }}/homeassistant"
-        state: directory
-        owner: "{{ ansible_ssh_user }}"
-        group: docker
-        mode: ug=rwx,g=rwx,o=rx
-    - name: Remove home assistant container if that exists
-      community.general.docker_container:
-        name: home-assistant
-        state: absent
-    - name: Create home assistant container
-      community.general.docker_container:
-        name: home-assistant
-        image: homeassistant/raspberrypi4-homeassistant:stable
-        restart_policy: unless-stopped
-        container_default_behavior: no_defaults
-        # Define behavior
-        network_mode: host
-        auto_remove: no
-        detach: yes
-        interactive: no
-        paused: no
-        privileged: no
-        read_only: no
-        tty: no
-        memory: "0"
-        init: yes
-        env:
-          TZ: "{{ timezone }}"
-        volumes:
-          - "{{ data_dir }}/homeassistant:/config"
     - name: Wait until home-assistant starts and creates its default configuration.yaml
       wait_for:
-        path: "{{ data_dir }}/homeassistant/configuration.yaml"
-    - name: Add mqtt and postgresql configurations
+        path: "{{ data_dir }}/home-assistant/config/configuration.yaml"
+    - name: Install HACS
+      raw: "cd {{ data_dir }}/home-assistant/config && wget -O - https://get.hacs.xyz | bash -"
+    - name: Add postgresql configuration and locations
       blockinfile:
-        path: "{{ data_dir }}/homeassistant/configuration.yaml"
+        path: "{{ data_dir }}/home-assistant/config/configuration.yaml"
         state: present
         block: |
           homeassistant:
@@ -163,254 +162,18 @@
             internal_url: https://{{ duckdns.domain }}
 
           recorder:
-            db_url: postgresql://{{postgresql_users[0].name}}:{{postgresql_users[0].password}}@localhost/{{ postgresql_databases[0].name }}
+            db_url: postgresql://{{postgresql_users[0].name}}:{{postgresql_users[0].password}}@postgres/{{ postgresql_databases[0].name }}
             purge_keep_days: 30
 
-          mqtt:
-            broker: localhost
-            port: 1883
-            discovery: true
+          http:
+            use_x_forwarded_for: true
+            trusted_proxies:
+              - 127.0.0.1
+              - {{ ansible_default_ipv4.address }}
 
-#Homeassistant end
+    - name: Restart home-assistant
+      raw: "docker restart home-assistant"
 
-#Mosquitto begin
-    - name: Create mosquitto dir
-      when: components.mosquitto
-      file:
-        path: "{{ data_dir }}/mosquitto"
-        state: directory
-        owner: "{{ ansible_ssh_user }}"
-        group: docker
-        mode: ug=rwx,g=rwx,o=rx
-    - name: Save mosquitto.conf
-      when: components.mosquitto
-      template:
-        src: ./templates/mosquitto.conf
-        dest: "{{ data_dir }}/mosquitto/mosquitto.conf"
-        owner: "{{ ansible_ssh_user }}"
-        group: docker
-        mode: ug=rwx,g=rwx,o=rx
-    - name: Remove mosquitto container if that exists
-      when: components.mosquitto
-      community.general.docker_container:
-        name: mosquitto
-        state: absent
-    - name: Create mosquitto container
-      when: components.mosquitto
-      community.general.docker_container:
-        name: mosquitto
-        image: eclipse-mosquitto
-        restart_policy: unless-stopped
-        container_default_behavior: no_defaults
-        # Define behavior
-        network_mode: host
-        auto_remove: no
-        detach: yes
-        interactive: no
-        paused: no
-        privileged: no
-        read_only: no
-        tty: no
-        memory: "0"
-        init: no
-        volumes:
-          - "{{ data_dir }}/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf"
-          - "{{ data_dir }}/mosquitto/data:/mosquitto/data"
-          - "{{ data_dir }}/mosquitto/log:/mosquitto/log"
-#Mosquitto begin
-
-#Zigbee2mqtt begin
-    - name: Create zigbee2mqtt dir
-      when: components.zigbee2mqtt
-      file:
-        path: "{{ data_dir }}/zigbee2mqtt"
-        state: directory
-        owner: "{{ ansible_ssh_user }}"
-        group: docker
-        mode: ug=rwx,g=rwx,o=rx
-    - name: Remove zigbee2mqtt container if that exists
-      when: components.zigbee2mqtt
-      community.general.docker_container:
-        name: zigbee2mqtt
-        state: absent
-    - name: Create zigbee2mqtt
-      when: components.zigbee2mqtt
-      community.general.docker_container:
-        name: zigbee2mqtt
-        image: koenkk/zigbee2mqtt
-        restart_policy: unless-stopped
-        container_default_behavior: no_defaults
-        # Define behavior
-        network_mode: host
-        auto_remove: no
-        detach: yes
-        interactive: no
-        paused: no
-        privileged: yes
-        read_only: no
-        tty: no
-        memory: "0"
-        init: yes
-        env:
-          TZ: "{{ timezone }}"
-        #devices:
-        #  - "/dev/ttyACM0:/dev/ttyACM0:rwm"
-        volumes:
-          - "{{ data_dir }}/zigbee2mqtt/data:/app/data"
-          - /run/udev:/run/udev:ro
-#Zigbee2mqtt end
-
-#BT-MQTT-Gateway begin
-    - name: Create bt-mqtt-gateway dir
-      when: components.btmqttgateway
-      file:
-        path: "{{ data_dir }}/bt-mqtt-gateway"
-        state: directory
-        owner: "{{ ansible_ssh_user }}"
-        group: docker
-        mode: ug=rwx,g=rwx,o=rx
-    - name: Save bt-mqtt-gateway-config.yaml
-      when: components.btmqttgateway
-      template:
-        src: ./templates/bt-mqtt-gateway-config.yaml
-        dest: "{{ data_dir }}/bt-mqtt-gateway/config.yaml"
-        owner: "{{ ansible_ssh_user }}"
-        group: docker
-        mode: ug=rwx,g=rwx,o=rx
-    - name: Remove bt-mqtt-gateway container if that exists
-      when: components.btmqttgateway
-      community.general.docker_container:
-        name: bt-mqtt-gateway
-        state: absent
-    - name: Create bt-mqtt-gateway container
-      when: components.btmqttgateway
-      community.general.docker_container:
-        name: bt-mqtt-gateway
-        image: zewelor/bt-mqtt-gateway
-        restart_policy: unless-stopped
-        container_default_behavior: no_defaults
-        # Define behavior
-        network_mode: host
-        auto_remove: no
-        detach: yes
-        interactive: no
-        paused: no
-        privileged: no
-        read_only: no
-        tty: no
-        memory: "0"
-        init: no
-        capabilities:
-          - NET_ADMIN
-          - NET_RAW
-        volumes:
-          - "{{ data_dir }}/bt-mqtt-gateway/config.yaml:/config.yaml"
-#BT-MQTT-Gateway end
-
-#code-server begin
-    - name: Create code-server dir
-      when: components.codeserver
-      file:
-        path: "{{ data_dir }}/code-server"
-        state: directory
-        owner: "{{ ansible_ssh_user }}"
-        group: docker
-        mode: ug=rwx,g=rwx,o=rx
-    - name: Remove code-server container if that exists
-      when: components.codeserver
-      community.general.docker_container:
-        name: code-server
-        state: absent
-    - name: Create code-server container
-      when: components.codeserver
-      community.general.docker_container:
-        name: code-server
-        image: ghcr.io/linuxserver/code-server
-        restart_policy: unless-stopped
-        container_default_behavior: no_defaults
-        # Define behavior
-        network_mode: host
-        auto_remove: no
-        detach: yes
-        interactive: no
-        paused: no
-        privileged: yes
-        read_only: no
-        tty: no
-        memory: "0"
-        init: no
-        env:
-          TZ: "{{ timezone }}"
-          PUID: "0"
-          PGID: "0"
-          PASSWORD: "{{ codeserver.password }}"
-        volumes:
-          - "{{ data_dir }}/code-server:/config"
-          - "{{ data_dir }}/:/opt/alykoti/"
-          - "{{ data_dir }}/traefik/traefik-dyn.yml:/etc/traefik/traefik-dyn.yml"
-#code-server end
-
-#pihole begin
-    - name: Create pihole dir
-      when: components.pihole
-      file:
-        path: "{{ data_dir }}/pihole"
-        state: directory
-        owner: "{{ ansible_ssh_user }}"
-        group: docker
-        mode: ug=rwx,g=rwx,o=rx
-    - name: Create etc/pihole dir
-      when: components.pihole
-      file:
-        path: "{{ data_dir }}/pihole/etc-pihole"
-        state: directory
-        owner: "{{ ansible_ssh_user }}"
-        group: docker
-        mode: ug=rwx,g=rwx,o=rx
-    - name: Create etc/dns-masq.d dir
-      when: components.pihole
-      file:
-        path: "{{ data_dir }}/pihole/etc-dns-masq.d"
-        state: directory
-        owner: "{{ ansible_ssh_user }}"
-        group: docker
-        mode: ug=rwx,g=rwx,o=rx
-    - name: Remove pihole container if that exists
-      when: components.pihole
-      community.general.docker_container:
-        name: pihole
-        state: absent
-    - name: Create pihole container
-      when: components.pihole
-      community.general.docker_container:
-        name: pihole
-        image: pihole/pihole:latest
-        restart_policy: unless-stopped
-        container_default_behavior: no_defaults
-        # Define behavior
-        network_mode: bridge
-        auto_remove: no
-        detach: yes
-        interactive: no
-        paused: no
-        privileged: yes
-        read_only: no
-        tty: no
-        memory: "0"
-        init: no
-        ports:
-          - "53:53/tcp"
-          - "53:53/udp"
-          - "9100:80"
-          - "9443:443"
-        env:
-          TZ: "{{ timezone }}"
-          ServerIP: "{{ ansible_default_ipv4.address }}"
-          VIRTUAL_HOST: "pihole.{{ duckdns.domain }}"
-        volumes:
-          - "{{ data_dir }}/pi-hole/etc-pihole/:/etc/pihole/"
-          - "{{ data_dir }}/pi-hole/etc-dnsmasq.d/:/etc/dnsmasq.d/"
-#pihole end
 
 #Homebridge begin
     - name: Create homebridge dir
@@ -491,75 +254,12 @@
           - "{{ data_dir }}/nodered/:/data"
 #Node-RED end
 
-#Frigate begin
-    - name: Create frigate dir
-      when: components.frigate
-      file:
-        path: "{{ data_dir }}/frigate"
-        state: directory
-        owner: "{{ ansible_ssh_user }}"
-        group: docker
-        mode: ug=rwx,g=rwx,o=rx
-    - name: Create frigate dir
-      when: components.frigate
-      file:
-        path: "{{ data_dir }}/frigate/clips"
-        state: directory
-        owner: "{{ ansible_ssh_user }}"
-        group: docker
-        mode: ug=rwx,g=rwx,o=rx
-    - name: Create frigate dir
-      when: components.frigate
-      file:
-        path: "{{ data_dir }}/frigate/config"
-        state: directory
-        owner: "{{ ansible_ssh_user }}"
-        group: docker
-        mode: ug=rwx,g=rwx,o=rx
-    - name: Save frigate-config.yml
-      when: components.frigate
-      template:
-        src: ./templates/frigate-config.yml
-        dest: "{{ data_dir }}/frigate/config/config.yml"
-        owner: "{{ ansible_ssh_user }}"
-        group: docker
-        mode: ug=rwx,g=rwx,o=rx
-    - name: Remove frigate container if that exists
-      when: components.frigate
-      community.general.docker_container:
-        name: frigate
-        state: absent
-    - name: Create frigate container
-      when: components.frigate
-      community.general.docker_container:
-        name: frigate
-        image: blakeblackshear/frigate:stable-armv7
-        restart_policy: unless-stopped
-        container_default_behavior: no_defaults
-        # Define behavior
-        network_mode: host
-        auto_remove: no
-        detach: yes
-        interactive: no
-        paused: no
-        privileged: yes
-        read_only: no
-        tty: no
-        memory: "0"
-        init: no
-        volumes:
-          - "{{ data_dir }}/frigate/clips:/clips:rw"
-          - "{{ data_dir }}/frigate/config:/config:rw"
-          - "{{ data_dir }}/traefik/traefik.yml:/etc/traefik/traefik.yml"
-          - "{{ data_dir }}/traefik/traefik-dyn.yml:/etc/traefik/traefik-dyn.yml"
-          - "/dev/bus/usb:/dev/bus/usb"
-          - "/etc/localtime:/etc/localtime:ro"
-#Frigate end
-
 - name: Final reboot
-  hosts: rpi
+  hosts: alykoti_server
   become: true
   tasks:
+    - name: Initial backup
+      raw: borgmatic -c /etc/borgmatic/config.yaml --create --prune
     - name: Reboot
       shell: nohup bash -c "/bin/sleep 5 && /sbin/shutdown -r now" &
       become: true

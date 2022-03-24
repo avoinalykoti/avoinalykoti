@@ -1,0 +1,67 @@
+detectors:
+  coral1:
+    type: edgetpu
+    device: usb
+  cpu1:
+    type: cpu
+
+mqtt:
+  host: {{ ansible_default_ipv4.address }}
+  port: 1883
+  topic_prefix: frigate
+  client_id: frigate
+
+record:
+  enabled: True
+  retain:
+    days: 1
+    mode: motion
+  events:
+    retain:
+      default: 14
+      mode: active_objects
+
+ffmpeg:
+  hwaccel_args:
+    - -hwaccel
+    - vaapi
+    - -hwaccel_device
+    - /dev/dri/renderD128
+    - -hwaccel_output_format
+    - yuv420p
+  global_args:
+    - -hide_banner
+    - -loglevel
+    - panic
+
+objects:
+  track:
+    - person
+    - bicycle
+    - car
+    - dog
+    - cat
+    - hot dog
+    - banana
+
+cameras:
+  first_camera:
+    ffmpeg:
+      inputs:
+        - path: rtsp://192.168.20.84:554/s0
+          roles:
+            - detect
+            - record
+    detect:
+      height: 1080
+      width: 1920
+      fps: 2
+    rtmp:
+      enabled: False
+    objects:
+      track:
+        - person
+        - bicycle
+        - car
+        - dog
+        - cat

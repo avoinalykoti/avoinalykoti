@@ -1,0 +1,29 @@
+version: "3"
+services:
+  code-server:
+    container_name: code-server
+    image: ghcr.io/linuxserver/code-server
+    restart: unless-stopped
+    privileged: true
+    volumes:
+      - "{{ data_dir }}/code-server/config:/config"
+      - "{{ data_dir }}/:/opt/alykoti/"
+    environment:
+      TZ: "{{ timezone }}"
+      PUID: "0"
+      PGID: "0"
+      PASSWORD: "{{ codeserver.password }}"
+    networks:
+      - smarthome
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=smarthome"
+      - "traefik.http.routers.editor-secure.entrypoints=websecure"
+      - "traefik.http.routers.editor-secure.rule=Host(`editor.{{ duckdns.domain }}`)"
+      - "traefik.http.routers.editor-secure.service=editor"
+      - "traefik.http.services.editor.loadbalancer.server.port=80"
+
+networks:
+  smarthome:
+    name: smarthome
+    external: true

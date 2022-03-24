@@ -1,0 +1,8 @@
+# Minimal configuration.yml example
+permit_join: true
+mqtt:
+  server: mqtt://{{ ansible_default_ipv4.address }}
+serial:
+  port: {{ zigbee2mqtt.serial_port }}
+frontend:
+  port: 8080

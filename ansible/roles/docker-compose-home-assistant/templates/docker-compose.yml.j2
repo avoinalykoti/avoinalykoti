@@ -1,0 +1,26 @@
+version: '3.8'
+services:
+  homeassistant:
+    container_name: home-assistant
+    image: homeassistant/home-assistant:latest
+    restart: always
+    privileged: true
+    command: [ "python", "-m", "homeassistant", "--config", "/config", "--log-rotate-days", '3' ]
+    volumes:
+      - "{{ data_dir }}/home-assistant/config:/config"
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    networks:
+      - smarthome
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=smarthome"
+      - "traefik.http.routers.home-assistant-secure.entrypoints=websecure"
+      - "traefik.http.routers.home-assistant-secure.rule=Host(`{{ duckdns.domain }}`)"
+      - "traefik.http.routers.home-assistant-secure.service=home-assistant"
+      - "traefik.http.services.home-assistant.loadbalancer.server.port=8123"
+
+networks:
+  smarthome:
+    name: smarthome
+    external: true

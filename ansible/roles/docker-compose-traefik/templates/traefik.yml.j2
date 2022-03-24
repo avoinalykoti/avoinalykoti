@@ -1,0 +1,43 @@
+api:
+  dashboard: true
+
+entryPoints:
+  web:
+    address: :80
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+
+  websecure:
+    address: :443
+    http:
+      middlewares:
+        - secureHeaders@file
+      tls:
+        certResolver: letsencrypt
+
+  mqtt:
+    address: :1883
+
+  mqttsecure:
+    address: :8883
+
+  postgres:
+    address: :5432
+
+
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+  file:
+    filename: /configurations/dynamic.yml
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: {{ letsencrypt_email }}
+      storage: acme.json
+      dnsChallenge:
+        provider: duckdns

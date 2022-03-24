@@ -1,0 +1,27 @@
+version: '3'
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:11.1
+    restart: always
+    networks:
+      - smarthome
+    environment:
+      POSTGRES_USER: {{ postgresql_users[0].name }}
+      POSTGRES_PASSWORD: {{ postgresql_users[0].password }}
+      POSTGRES_DB: {{ postgresql_databases[0].name }}
+    volumes:
+      - "{{ data_dir }}/postgresql/data:/var/lib/postgresql/data"
+      - /etc/localtime:/etc/localtime:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=smarthome"
+      - "traefik.tcp.services.postgres.loadbalancer.server.port=5432"
+      - "traefik.tcp.routers.postgres.entrypoints=postgres"
+      - "traefik.tcp.routers.postgres.rule=HostSNI(`*`)"
+      - "traefik.tcp.routers.postgres.service=postgres"
+
+networks:
+  smarthome:
+    name: smarthome
+    external: true

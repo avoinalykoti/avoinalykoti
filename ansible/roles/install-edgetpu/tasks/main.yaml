@@ -1,0 +1,26 @@
+# roles/install-edgetpu/tasks/main.yaml
+---
+
+
+- name: Add an apt signing key, uses whichever key is at the URL
+  become: true
+  ansible.builtin.apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+
+- name: Add Google Coral TPU repository into sources list
+  become: true
+  ansible.builtin.apt_repository:
+    repo: deb https://packages.cloud.google.com/apt coral-edgetpu-stable main
+    state: present
+
+- name: Update apt packages
+  become: true
+  apt:
+    update_cache: yes
+
+- name: Install PCIe driver and Edge TPU runtime packages
+  apt:
+    pkg:
+    - gasket-dkms
+    - libedgetpu1-std  

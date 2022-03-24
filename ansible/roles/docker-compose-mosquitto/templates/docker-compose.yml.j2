@@ -1,0 +1,37 @@
+version: "3.8"
+services:
+  mosquitto:
+    container_name: mosquitto
+    image: eclipse-mosquitto
+    restart: unless-stopped
+    volumes:
+      - "{{ data_dir }}/mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf"
+      - "{{ data_dir }}/mosquitto/data:/mosquitto/data"
+      - "{{ data_dir }}/mosquitto/log:/mosquitto/log"
+    networks:
+      - smarthome
+    user: "1000:998" # without this it runs with 1883:1883
+
+    labels:
+
+      - traefik.enable=true
+
+      # mqtts
+      - traefik.docker.network=smarthome
+      - traefik.tcp.services.mqttsecure.loadbalancer.server.port=1883
+      - traefik.tcp.routers.mqttsecure.entrypoints=mqttsecure
+      - traefik.tcp.routers.mqttsecure.tls=true
+      - traefik.tcp.routers.mqttsecure.rule=HostSNI(`mosquitto.{{ duckdns.domain }}`)
+      - traefik.tcp.routers.mqttsecure.service=mqttsecure
+      - traefik.tcp.routers.mqttsecure.tls.certresolver=letsencrypt
+
+      # insecure mqtt
+      - traefik.tcp.services.mqtt.loadbalancer.server.port=1883
+      - traefik.tcp.routers.mqtt.entrypoints=mqtt
+      - traefik.tcp.routers.mqtt.rule=HostSNI(`*`)
+      - traefik.tcp.routers.mqtt.service=mqtt
+
+networks:
+  smarthome:
+    name: smarthome
+    external: true

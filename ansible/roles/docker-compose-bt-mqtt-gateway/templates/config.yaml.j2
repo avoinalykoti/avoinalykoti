@@ -1,5 +1,5 @@
 mqtt:
-  host: localhost
+  host: {{ ansible_default_ipv4.address }}
   port: 1883
   client_id: bt-mqtt-gateway
   availability_topic: lwt_topic

@@ -1,0 +1,24 @@
+# roles/docker-compose-postgres/tasks/main.yaml
+---
+
+- name: Create postgres dirs
+  file:
+    path: "{{ data_dir }}/{{item}}"
+    state: directory
+    owner: "{{ ansible_ssh_user }}"
+    group: docker
+    mode: ug+rw,g+s
+  loop:
+   - postgres
+   - postgres/data
+- name: Generate docker-compose.yml
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ data_dir }}/postgres/docker-compose.yml"
+    owner: "{{ ansible_ssh_user }}"
+    group: docker
+    mode: ug+rw
+    force: no
+- name: Deploy postgres
+  docker_compose:
+    project_src: "{{ data_dir }}/postgres"

@@ -1,0 +1,32 @@
+version: "3"
+services:
+  pi-hole:
+    container_name: pi-hole
+    image: pihole/pihole:latest
+    restart: unless-stopped
+    privileged: true
+    environment:
+      TZ: "{{ timezone }}"
+      ServerIP: "{{ ansible_default_ipv4.address }}"
+      VIRTUAL_HOST: "pi-hole.{{ duckdns.domain }}"
+    volumes:
+      - "{{ data_dir }}/pi-hole/etc/pihole/:/etc/pihole/"
+      - "{{ data_dir }}/pi-hole/etc/dnsmasq.d/:/etc/dnsmasq.d/"
+
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+    networks:
+      - smarthome
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=smarthome"
+      - "traefik.http.routers.pi-hole-secure.entrypoints=websecure"
+      - "traefik.http.routers.pi-hole-secure.rule=Host(`pi-hole.{{ duckdns.domain }}`)"
+      - "traefik.http.routers.pi-hole-secure.service=pi-hole"
+      - "traefik.http.services.pi-hole.loadbalancer.server.port=80"
+
+networks:
+  smarthome:
+    name: smarthome
+    external: true

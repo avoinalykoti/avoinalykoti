@@ -1,0 +1,30 @@
+version: "3.8"
+services:
+  frigate:
+    container_name: frigate
+    image: {{ frigate.image }}
+    restart: unless-stopped
+    privileged: true
+    shm_size: "256mb"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - "{{ data_dir }}/frigate/clips:/media/frigate/clips:rw"
+      - "{{ data_dir }}/frigate/recordings:/media/frigate/recordings:rw"
+      - "{{ data_dir }}/frigate/config:/config:rw"
+      - /dev/bus/usb:/dev/bus/usb
+      - /dev/dri:/dev/dri
+
+    networks:
+      - smarthome
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=smarthome"
+      - "traefik.http.routers.frigate-secure.entrypoints=websecure"
+      - "traefik.http.routers.frigate-secure.rule=Host(`frigate.{{ duckdns.domain }}`)"
+      - "traefik.http.routers.frigate-secure.service=frigate"
+      - "traefik.http.services.frigate.loadbalancer.server.port=5000"
+
+networks:
+  smarthome:
+    name: smarthome
+    external: true

@@ -1,0 +1,55 @@
+# roles/docker-compose-zerotier/tasks/main.yaml
+---
+
+- name: Create a network
+  docker_network:
+    name: smarthome
+- name: Create traefik dir
+  file:
+    path: "{{ data_dir }}/{{item}}"
+    state: directory
+    owner: "{{ ansible_ssh_user }}"
+    group: docker
+    mode: ug+rw,g+s
+  loop:
+   - traefik
+   - traefik/data
+   - traefik/data/configurations
+- name: Generate traefik.yml
+  template:
+    src: traefik.yml.j2
+    dest: "{{ data_dir }}/traefik/data/traefik.yml"
+    owner: "{{ ansible_ssh_user }}"
+    group: docker
+    mode: ug+rw
+    force: no
+- name: Generate dynamic.yml
+  template:
+    src: dynamic.yml.j2
+    dest: "{{ data_dir }}/traefik/data/configurations/dynamic.yml"
+    owner: "{{ ansible_ssh_user }}"
+    group: docker
+    mode: ug+rw
+    force: no
+- name: Generate acme.json
+  copy:
+    content: ""
+    dest: "{{ data_dir }}/traefik/data/acme.json"
+    owner: "{{ ansible_ssh_user }}"
+    group: docker
+    mode: 0600
+    force: no
+- name: Generate docker-compose.yml
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ data_dir }}/traefik/docker-compose.yml"
+    owner: "{{ ansible_ssh_user }}"
+    group: docker
+    mode: ug+rw
+    force: no
+- name: Deploy traefik
+  docker_compose:
+    project_src: "{{ data_dir }}/traefik"
+    recreate: always
+    pull: yes
+    state: present

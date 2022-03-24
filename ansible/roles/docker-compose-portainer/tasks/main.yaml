@@ -1,0 +1,24 @@
+# roles/docker-compose-zerotier/tasks/main.yaml
+---
+
+- name: Create portainer dirs
+  file:
+    path: "{{ data_dir }}/{{item}}"
+    state: directory
+    owner: "{{ ansible_ssh_user }}"
+    group: docker
+    mode: ug+rw,g+s
+  loop:
+   - portainer
+   - portainer/data
+- name: Generate docker-compose.yml
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ data_dir }}/portainer/docker-compose.yml"
+    owner: "{{ ansible_ssh_user }}"
+    group: docker
+    mode: ug+rw
+    force: no
+- name: Deploy portainer
+  docker_compose:
+    project_src: "{{ data_dir }}/portainer"

@@ -1,0 +1,34 @@
+# roles/docker-compose-zerotier/tasks/main.yaml
+---
+
+- name: Create frigate dir
+  file:
+    path: "{{ data_dir }}/{{item}}"
+    state: directory
+    owner: "{{ ansible_ssh_user }}"
+    group: docker
+    mode: ug+rw,g+s
+  loop:
+   - frigate
+   - frigate/clips
+   - frigate/recordings
+   - frigate/config
+- name: Generate frigate-config.yml
+  template:
+    src: frigate-config.yml.j2
+    dest: "{{ data_dir }}/frigate/config/config.yml"
+    owner: "{{ ansible_ssh_user }}"
+    group: docker
+    mode: ug+rw
+    force: no
+- name: Generate docker-compose.yml
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ data_dir }}/frigate/docker-compose.yml"
+    owner: "{{ ansible_ssh_user }}"
+    group: docker
+    mode: ug+rw
+    force: no
+- name: Deploy frigate
+  docker_compose:
+    project_src: "{{ data_dir }}/frigate"

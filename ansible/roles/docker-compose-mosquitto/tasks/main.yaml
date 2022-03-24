@@ -1,0 +1,42 @@
+# roles/docker-compose-mosquitto/tasks/main.yaml
+---
+
+- name: Create mosquitto dirs
+  file:
+    path: "{{ data_dir }}/{{item}}"
+    state: directory
+    owner: "{{ ansible_ssh_user }}"
+    group: docker
+    mode: ug+rw,g+s
+  loop:
+   - mosquitto
+   - mosquitto/config
+   - mosquitto/data
+   - mosquitto/log
+- name: Generate mosquitto config
+  template:
+    src: mosquitto.conf.j2
+    dest: "{{ data_dir }}/mosquitto/config/mosquitto.conf"
+    owner: "{{ ansible_ssh_user }}"
+    group: docker
+    mode: ug+rw
+    force: no
+- name: Create empty db file for mosquitto
+  copy:
+    content: ""
+    dest: "{{ data_dir }}/mosquitto/data/mosquitto.db"
+    force: no
+    owner: "{{ ansible_ssh_user }}"
+    group: docker
+    mode: ug+rw
+- name: Generate docker-compose.yml
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ data_dir }}/mosquitto/docker-compose.yml"
+    owner: "{{ ansible_ssh_user }}"
+    group: docker
+    mode: ug+rw
+    force: no
+- name: Deploy mosquitto
+  docker_compose:
+    project_src: "{{ data_dir }}/mosquitto"

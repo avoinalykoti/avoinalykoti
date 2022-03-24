@@ -1,0 +1,23 @@
+# roles/docker-compose-code-server/tasks/main.yaml
+---
+
+- name: Create code-server dir
+  file:
+    path: "{{ data_dir }}/{{item}}"
+    state: directory
+    owner: "{{ ansible_ssh_user }}"
+    group: docker
+    mode: ug+rw,g+s
+  loop:
+   - code-server
+   - code-server/config
+- name: Generate docker-compose.yml
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ data_dir }}/code-server/docker-compose.yml"
+    owner: "{{ ansible_ssh_user }}"
+    group: docker
+    mode: ug+rw
+- name: Deploy code-server
+  docker_compose:
+    project_src: "{{ data_dir }}/code-server"

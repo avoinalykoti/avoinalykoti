@@ -1,0 +1,29 @@
+version: '3.8'
+services:
+  zigbee2mqtt:
+    container_name: zigbee2mqtt
+    image: koenkk/zigbee2mqtt
+    restart: unless-stopped
+    volumes:
+      - "{{ data_dir }}/zigbee2mqtt/data:/app/data"
+      - /run/udev:/run/udev:ro
+    environment:
+      - TZ={{ timezone }}
+{% if zigbee2mqtt.device_type == 'serial' %}
+    devices:
+      - {{ zigbee2mqtt.serial_port }}:{{ zigbee2mqtt.serial_port }}
+{% endif %}      
+    networks:
+      - smarthome
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=smarthome"
+      - "traefik.http.routers.zigbee2mqtt-secure.entrypoints=websecure"
+      - "traefik.http.routers.zigbee2mqtt-secure.rule=Host(`zigbee2mqtt.{{ duckdns.domain }}`)"
+      - "traefik.http.routers.zigbee2mqtt-secure.service=zigbee2mqtt"
+      - "traefik.http.services.zigbee2mqtt.loadbalancer.server.port=8080"
+
+networks:
+  smarthome:
+    name: smarthome
+    external: true
