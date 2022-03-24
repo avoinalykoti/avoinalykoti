@@ -131,7 +131,7 @@
     - docker-compose-traefik
     - docker-compose-frigate
     - docker-compose-mosquitto
-    - docker-compose-bt-mqtt-gateway
+#    - docker-compose-bt-mqtt-gateway
     - docker-compose-code-server
     - docker-compose-zigbee2mqtt
     - docker-compose-pi-hole
