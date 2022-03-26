@@ -1,6 +1,6 @@
 
 
-- name: Install minimal requirements for Ansible
+- name: Install minimal requirements for Ansible and disable root password asking
   hosts: alykoti_server
   become: true
   gather_facts: no
@@ -15,30 +15,17 @@
     - name: Install some useful stuff
       raw: apt-get -y install python python3 python3-pip python3-setuptools acl unzip postgresql-client
 
-- name: Install and configure
+- name: Set timezone and configure unattended upgrades (and update/upgrade system)
   hosts: alykoti_server
   become: true
   vars_files:
     - vars/main.yaml
+  roles:
+    - jnv.unattended-upgrades
   tasks:
     - name: Set timezone
       community.general.timezone:
         name: "{{ timezone }}"
-    - name: Disable the systemd-resolve stub DNS resolver..
-      when: components.pihole
-      lineinfile:
-        dest: /etc/systemd/resolved.conf
-        regexp: '^#DNSStubListener='
-        line: 'DNSStubListener=no'
-        state: present
-    - name: Link resolv.conf to follow netplan (router provided DNS)..
-      raw: "rm /etc/resolv.conf && ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf"
-      when: components.pihole
-    - name: Restart systemd-resolved..
-      when: components.pihole
-      ansible.builtin.service:
-        name: systemd-resolved
-        state: restarted
     - name: update and upgrade
       apt:
         upgrade: safe
@@ -50,7 +37,7 @@
     - name: Wait 
       wait_for_connection: timeout=300 delay=30
 
-- name: Install stuff which is running locally on host
+- name: Install smarthome-related stuff which is running locally on host
   hosts: alykoti_server
   become: true
   vars_files:
@@ -68,51 +55,12 @@
   roles:
     - { role: install-edgetpu, 
       when: frigate.edgetpu=='pci' }
-
     - geerlingguy.pip
     - geerlingguy.docker
-    - jnv.unattended-upgrades
-    - role: m3nu.ansible_role_borgbackup
-      borg_encryption_passphrase: "{{ borg.encryption_passphrase }}"
-      borg_repository: "{{ borg.repository }}"
-      # this could add new repo, but there is currently something wrong with this role:
-      # https://github.com/borgbase/ansible-role-borgbackup/issues/83
-      # create_repo: true
-      # bb_token: "{{ borg.bb_token}}"
-      # bb_region: "{{ borg.bb_region}}"
-      # bb_quota: "{{ borg.bb_quota}}"
-      # bb_quota_size: "{{ borg.bb_quota_size}}"
-      # bb_repo_name: "{{ borg.bb_repo_name}}"
-      borg_source_directories:
-        - "{{ data_dir }}"
-      borg_exclude_patterns:
-        - /opt/alykoti/frigate/media
-      borg_retention_policy:
-        keep_hourly: 3
-        keep_daily: 7
-        keep_weekly: 4
-        keep_monthly: 6
-      borgmatic_hooks:
-        before_backup:
-        - echo "`date` - Starting backup."
-        postgresql_databases:
-        - name: "{{ postgresql_databases[0].name }}"
-          username: "{{ postgresql_users[0].name }}" 
-          password: "{{ postgresql_users[0].password }}" 
-          options: "-h 127.0.0.1"
-
+    # this role installs m3nu.ansible_role_borgbackup but also inits backup etc
+    - role: smarthome-borgbackup 
 
   tasks:
-    - name: Reminder to add ssh key to borgbase.com
-      pause:
-        prompt: "Open https://www.borgbase.com/account , add ssh key (visible above) there. Press Enter when ready."
-    - name: Reminder to add ssh key to borgbase.com
-      pause:
-        prompt: "Open https://www.borgbase.com/repositories , edit your repository {{ borg.bb_repo_name }}, add ssh key to \"Append-Only Access\". Press Enter when ready. "
-    - name: accept borgbase ssh fingerprint
-      shell: ssh-keyscan -H {{ borg.host }} >> ~/.ssh/known_hosts
-    - name: Init borg repo
-      raw: borgmatic init --encryption repokey-blake2
     - name: Create datadir
       file:
         path: "{{ data_dir }}"
@@ -120,7 +68,6 @@
         owner: "{{ ansible_ssh_user }}"
         group: docker
         mode: ug+rw,g+s
-
 
 - name: Install containers
   hosts: alykoti_server
@@ -131,49 +78,15 @@
     - docker-compose-traefik
     - docker-compose-frigate
     - docker-compose-mosquitto
+    - docker-compose-postgres
+    - docker-compose-zigbee2mqtt
+    - docker-compose-home-assistant
 #    - docker-compose-bt-mqtt-gateway
     - docker-compose-code-server
-    - docker-compose-zigbee2mqtt
-    - docker-compose-pi-hole
     - docker-compose-portainer
-    - docker-compose-home-assistant
-    - docker-compose-postgres
+    - docker-compose-pi-hole
 
   tasks:
-#Homeassistant begin
-    - name: Wait until home-assistant starts and creates its default configuration.yaml
-      wait_for:
-        path: "{{ data_dir }}/home-assistant/config/configuration.yaml"
-    - name: Install HACS
-      raw: "cd {{ data_dir }}/home-assistant/config && wget -O - https://get.hacs.xyz | bash -"
-    - name: Add postgresql configuration and locations
-      blockinfile:
-        path: "{{ data_dir }}/home-assistant/config/configuration.yaml"
-        state: present
-        block: |
-          homeassistant:
-            name: {{ homeassistant.name }}
-            latitude: {{ homeassistant.latitude }}
-            longitude: {{ homeassistant.longitude }}
-            elevation: {{ homeassistant.elevation }}
-            unit_system: metric
-            time_zone: Europe/Helsinki
-            external_url: https://{{ duckdns.domain }}
-            internal_url: https://{{ duckdns.domain }}
-
-          recorder:
-            db_url: postgresql://{{postgresql_users[0].name}}:{{postgresql_users[0].password}}@postgres/{{ postgresql_databases[0].name }}
-            purge_keep_days: 30
-
-          http:
-            use_x_forwarded_for: true
-            trusted_proxies:
-              - 172.16.0.0/12 # docker network
-
-    - name: Restart home-assistant
-      raw: "docker restart home-assistant"
-
-
 #Homebridge begin
     - name: Create homebridge dir
       when: components.homebridge
