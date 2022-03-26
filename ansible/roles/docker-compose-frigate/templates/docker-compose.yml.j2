@@ -8,8 +8,7 @@ services:
     shm_size: "256mb"
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - "{{ data_dir }}/frigate/clips:/media/frigate/clips:rw"
-      - "{{ data_dir }}/frigate/recordings:/media/frigate/recordings:rw"
+      - "{{ data_dir }}/frigate/media:/media/frigate:rw"
       - "{{ data_dir }}/frigate/config:/config:rw"
       - /dev/bus/usb:/dev/bus/usb
       - /dev/dri:/dev/dri

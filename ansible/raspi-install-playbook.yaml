@@ -53,12 +53,13 @@
     docker_install_recommends: true
 
   roles:
+    - role: smarthome-borgbackup
     - { role: install-edgetpu, 
       when: frigate.edgetpu=='pci' }
     - geerlingguy.pip
     - geerlingguy.docker
     # this role installs m3nu.ansible_role_borgbackup but also inits backup etc
-    - role: smarthome-borgbackup 
+
 
   tasks:
     - name: Create datadir

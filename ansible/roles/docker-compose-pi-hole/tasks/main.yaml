@@ -1,6 +1,22 @@
 # roles/docker-compose-zerotier/tasks/main.yaml
 ---
 
+- name: Disable the systemd-resolve stub DNS resolver..
+  when: components.pihole
+  lineinfile:
+    dest: /etc/systemd/resolved.conf
+    regexp: '^#DNSStubListener='
+    line: 'DNSStubListener=no'
+    state: present
+- name: Link resolv.conf to follow netplan (router provided DNS)..
+  raw: "rm /etc/resolv.conf && ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf"
+  when: components.pihole
+- name: Restart systemd-resolved..
+  when: components.pihole
+  ansible.builtin.service:
+    name: systemd-resolved
+    state: restarted
+
 - name: Create pi-hole dirs
   file:
     path: "{{ data_dir }}/{{item}}"
@@ -31,7 +47,8 @@
 
 - name: Create dnsmasq conf to make duckdns domain work without connection to external dns
   copy:
-    content: "address=/{{duckdns.domain}}/{{ ansible_default_ipv4.address }}"
+    # this setting acts as a wildcard, so returning always local ipv4 address for  *.example.duckdns.org and example.duckdns.org
+    content: "address=/{{duckdns.domain}}/{{ ansible_default_ipv4.address }}" 
     dest: "{{ data_dir }}/pi-hole/etc/dnsmasq.d/99-smarthome.conf"
     force: no
     owner: "{{ ansible_ssh_user }}"

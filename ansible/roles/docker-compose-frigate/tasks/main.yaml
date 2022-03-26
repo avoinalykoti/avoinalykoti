@@ -10,8 +10,7 @@
     mode: ug+rw,g+s
   loop:
    - frigate
-   - frigate/clips
-   - frigate/recordings
+   - frigate/media
    - frigate/config
 - name: Generate frigate-config.yml
   template:
