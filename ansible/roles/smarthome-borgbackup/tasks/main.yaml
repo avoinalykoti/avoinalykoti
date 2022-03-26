@@ -1,35 +1,35 @@
 - name: Install m3nu.ansible_role_borgbackup
   include_role:
     name: m3nu.ansible_role_borgbackup
-    vars:
-      borg_encryption_passphrase: "{{ borg.encryption_passphrase }}"
-      borg_repository: "{{ borg.repository }}"
-      # this could add new repo, but there is currently something wrong with this role:
-      # https://github.com/borgbase/ansible-role-borgbackup/issues/83
-      # create_repo: true
-      # bb_token: "{{ borg.bb_token}}"
-      # bb_region: "{{ borg.bb_region}}"
-      # bb_quota: "{{ borg.bb_quota}}"
-      # bb_quota_size: "{{ borg.bb_quota_size}}"
-      # bb_repo_name: "{{ borg.bb_repo_name}}"
-      borg_source_directories:
-        - "{{ data_dir }}"
-        - /etc/borgmatic
-      borg_exclude_patterns:
-        - "{{ data_dir }}/frigate/media"
-      borg_retention_policy:
-        keep_hourly: 3
-        keep_daily: 7
-        keep_weekly: 4
-        keep_monthly: 6
-      borgmatic_hooks:
-        before_backup:
-        - echo "`date` - Starting backup."
-        postgresql_databases:
-        - name: "{{ postgresql_databases[0].name }}"
-          username: "{{ postgresql_users[0].name }}" 
-          password: "{{ postgresql_users[0].password }}" 
-          options: "-h 127.0.0.1"
+  vars:
+    borg_encryption_passphrase: "{{ borg.encryption_passphrase }}"
+    borg_repository: "{{ borg.repository }}"
+    # this could add new repo, but there is currently something wrong with this role:
+    # https://github.com/borgbase/ansible-role-borgbackup/issues/83
+    # create_repo: true
+    # bb_token: "{{ borg.bb_token}}"
+    # bb_region: "{{ borg.bb_region}}"
+    # bb_quota: "{{ borg.bb_quota}}"
+    # bb_quota_size: "{{ borg.bb_quota_size}}"
+    # bb_repo_name: "{{ borg.bb_repo_name}}"
+    borg_source_directories:
+      - "{{ data_dir }}"
+      - /etc/borgmatic
+    borg_exclude_patterns:
+      - "{{ data_dir }}/frigate/media"
+    borg_retention_policy:
+      keep_hourly: 3
+      keep_daily: 7
+      keep_weekly: 4
+      keep_monthly: 6
+    borgmatic_hooks:
+      before_backup:
+      - echo "`date` - Starting backup."
+      postgresql_databases:
+      - name: "{{ postgresql_databases[0].name }}"
+        username: "{{ postgresql_users[0].name }}" 
+        password: "{{ postgresql_users[0].password }}" 
+        options: "-h 127.0.0.1"
 - name: Reminder to add ssh key to borgbase.com
   pause:
     prompt: "Open https://www.borgbase.com/account , add ssh key (visible above) there. Press Enter when ready."
