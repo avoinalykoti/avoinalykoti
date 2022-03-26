@@ -5,13 +5,17 @@ services:
     image: {{ frigate.image }}
     restart: unless-stopped
     privileged: true
-    shm_size: "256mb"
+    shm_size: "256mb" # https://docs.frigate.video/installation/#calculating-required-shm-size
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - "{{ data_dir }}/frigate/media:/media/frigate:rw"
       - "{{ data_dir }}/frigate/config:/config:rw"
       - /dev/bus/usb:/dev/bus/usb
       - /dev/dri:/dev/dri
+      - type: tmpfs
+        target: /tmp/cache
+        tmpfs:
+          size: 1000000000
 
     networks:
       - smarthome
