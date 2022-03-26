@@ -51,14 +51,19 @@
       - "{{ ansible_ssh_user }}"
     docker_install_compose: true
     docker_install_recommends: true
+    zerotier_network_id: "{{ zerotier.network_id }}"
+    zerotier_api_accesstoken: "{{ zerotier.token }}"
 
   roles:
+    # this role installs m3nu.ansible_role_borgbackup but also inits backup etc
     - role: smarthome-borgbackup
     - { role: install-edgetpu, 
       when: frigate.edgetpu=='pci' }
     - geerlingguy.pip
     - geerlingguy.docker
-    # this role installs m3nu.ansible_role_borgbackup but also inits backup etc
+    - { role: m4rcu5nl.zerotier-one, 
+      when: components.zerotier }
+
 
 
   tasks:
