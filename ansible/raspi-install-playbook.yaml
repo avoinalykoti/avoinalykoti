@@ -56,7 +56,7 @@
 
   roles:
     # this role installs m3nu.ansible_role_borgbackup but also inits backup etc
-    #- role: smarthome-borgbackup
+    - role: smarthome-borgbackup
     - { role: install-edgetpu, 
       when: frigate.edgetpu=='pci' }
     - geerlingguy.pip
@@ -87,98 +87,26 @@
     - docker-compose-postgres
     - docker-compose-zigbee2mqtt
     - docker-compose-home-assistant
-#    - docker-compose-bt-mqtt-gateway
-    - docker-compose-code-server
+    # - docker-compose-bt-mqtt-gateway
+    # - docker-compose-code-server
     - docker-compose-portainer
-    - docker-compose-pi-hole
     - docker-compose-esphome
+    # - docker-compose-nodered
+    # - docker-compose-homebridge
+    - docker-compose-pi-hole
 
-  tasks:
-#Homebridge begin
-    - name: Create homebridge dir
-      when: components.homebridge
-      file:
-        path: "{{ data_dir }}/homebridge"
-        state: directory
-        owner: "{{ ansible_ssh_user }}"
-        group: docker
-        mode: ug=rwx,g=rwx,o=rx
-    - name: Remove homebridge container if that exists
-      when: components.homebridge
-      community.general.docker_container:
-        name: homebridge
-        state: absent
-    - name: Create homebridge container
-      when: components.homebridge
-      community.general.docker_container:
-        name: homebridge
-        image: oznu/homebridge
-        restart_policy: unless-stopped
-        container_default_behavior: no_defaults
-        # Define behavior
-        network_mode: host
-        auto_remove: no
-        detach: yes
-        interactive: no
-        paused: no
-        privileged: yes
-        read_only: no
-        tty: no
-        memory: "0"
-        init: no
-        env:
-          HOMEBRIDGE_CONFIG_UI: "{{ timezone }}"
-          HOMEBRIDGE_CONFIG_UI_PORT: "8081"
-          PUID: "0"
-          PGID: "0"
-        volumes:
-          - "{{ data_dir }}/homebridge/:/homebridge" 
-#Homebridge end
-
-#Node-RED begin
-    - name: Create nodered dir
-      when: components.nodered
-      file:
-        path: "{{ data_dir }}/nodered"
-        state: directory
-        owner: "{{ ansible_ssh_user }}"
-        group: docker
-        mode: ug=rwx,g=rwx,o=rx
-    - name: Remove nodered container if that exists
-      when: components.nodered
-      community.general.docker_container:
-        name: nodered
-        state: absent
-    - name: Create nodered container
-      when: components.nodered
-      community.general.docker_container:
-        name: nodered
-        image: nodered/node-red
-        restart_policy: unless-stopped
-        container_default_behavior: no_defaults
-        # Define behavior
-        network_mode: bridge
-        auto_remove: no
-        detach: yes
-        interactive: no
-        paused: no
-        privileged: yes
-        read_only: no
-        tty: no
-        memory: "0"
-        init: no
-        ports:
-          - "1880:1880"
-        volumes:
-          - "{{ data_dir }}/nodered/:/data"
-#Node-RED end
-
-- name: Initial backup and final reboot
+- name: Initial backup (or restore )and final reboot
   hosts: alykoti_server
+  vars_files:
+    - vars/main.yaml
   become: true
+  roles:
+    - { role: borgmatic-restore, 
+      when: installation_type=='restore' }
   tasks:
     - name: Initial backup
       raw: borgmatic -c /etc/borgmatic/config.yaml --create --prune
+      when: installation_type == "new" # lets now create new "empty" backup when restoring
     - name: Reboot
       shell: nohup bash -c "/bin/sleep 5 && /sbin/shutdown -r now" &
       become: true

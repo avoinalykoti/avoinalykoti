@@ -11,7 +11,7 @@ services:
       POSTGRES_PASSWORD: {{ postgresql_users[0].password }}
       POSTGRES_DB: {{ postgresql_databases[0].name }}
     volumes:
-      - "{{ data_dir }}/postgresql/data:/var/lib/postgresql/data"
+      - "{{ data_dir }}/postgres/data:/var/lib/postgresql/data"
       - /etc/localtime:/etc/localtime:ro
     labels:
       - "traefik.enable=true"

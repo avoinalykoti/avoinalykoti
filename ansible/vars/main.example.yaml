@@ -34,11 +34,6 @@ frigate:
   image: blakeblackshear/frigate:stable-amd64
   edgetpu: pci # pci or usb or none
 borg:
-  encryption_passphrase: something-here-long-string
   repository: abcdefg@abcdefg.repo.borgbase.com:repo
   host: abcdefg.repo.borgbase.com
   bb_repo_name: avoin-alykoti
-  bb_token: "not-in-use-yet"
-  bb_region: eu
-  bb_quota: true
-  bb_quota_size: 5000
