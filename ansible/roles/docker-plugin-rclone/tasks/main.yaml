@@ -1,0 +1,32 @@
+
+- name: Install fuse
+  apt:
+    pkg:
+    - fuse
+    
+- name: Create directories
+  file:
+    path: "{{item}}"
+    state: directory
+    owner: "root"
+    group: docker
+    mode: ug+rw,g+s
+  loop:
+   - /var/lib/docker-plugins/rclone/config
+   - /var/lib/docker-plugins/rclone/cache
+
+- name: Install a plugin
+  community.docker.docker_plugin:
+    plugin_name: rclone/docker-volume-rclone:amd64
+    state: present
+    alias: rclone
+    # https://rclone.org/docker/ states that --grant-all-permissions should be
+    # enabled on install
+    # https://github.com/ansible-collections/community.docker/issues/145
+    # tells that it is by default
+
+- name: Enable the plugin
+  community.docker.docker_plugin:
+    plugin_name: rclone/docker-volume-rclone:amd64
+    state: enable
+
