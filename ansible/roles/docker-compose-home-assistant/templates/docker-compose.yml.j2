@@ -5,8 +5,6 @@ services:
     image: homeassistant/home-assistant:latest
     restart: always
     network_mode: host # to make discovery work, this has to be host
-    privileged: true
-
     volumes:
       - "{{ data_dir }}/home-assistant/config:/config"
       - /etc/localtime:/etc/localtime:ro
