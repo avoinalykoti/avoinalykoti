@@ -1,0 +1,13 @@
+version: "3.8"
+services:
+  lms:
+    container_name: lms
+    image: lmscommunity/logitechmediaserver
+    restart: unless-stopped
+    volumes:
+      - "{{ data_dir }}/lms/config:/config:rw"
+      - "{{ data_dir }}/lms/media/music:/music:ro"
+      - "{{ data_dir }}/lms/media/playlist:/playlist:row"
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    network_mode: host # to make discovery work, this has to be host

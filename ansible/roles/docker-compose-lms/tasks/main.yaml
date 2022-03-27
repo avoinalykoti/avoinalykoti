@@ -1,0 +1,25 @@
+# roles/docker-compose-lms/tasks/main.yaml
+---
+
+- name: Create lms dir
+  file:
+    path: "{{ data_dir }}/{{item}}"
+    state: directory
+    owner: "{{ ansible_ssh_user }}"
+    group: docker
+    mode: ug+rw,g+s
+  loop:
+   - lms
+   - lms/media
+   - lms/config
+- name: Generate docker-compose.yml
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ data_dir }}/lms/docker-compose.yml"
+    owner: "{{ ansible_ssh_user }}"
+    group: docker
+    mode: ug+rw
+    force: no
+- name: Deploy lms
+  docker_compose:
+    project_src: "{{ data_dir }}/lms"
