@@ -1,0 +1,60 @@
+- name: Ensure root has SSH key.
+  user:
+    name: "root"
+    generate_ssh_key: yes
+    ssh_key_file: .ssh/id_ed25519
+    ssh_key_type: ed25519
+  register: root_user
+
+- name: Print key created for root user (use for remote repo)
+  debug:
+    var: root_user['ssh_public_key']
+- name: Reminder to add ssh key to borgbase.com
+  pause:
+    prompt: "Open https://www.borgbase.com/repositories , edit your repository {{ borg.bb_repo_name }}, add ssh key to \"Keys with Full Access\". Press Enter when ready. "
+- name: List archives from borgbase
+  shell: 'borgmatic list'
+  register: borgmatic_list_output
+- debug:
+    var: borgmatic_list_output.stdout_lines
+- name: Ask for archive to restore
+  pause:
+    prompt: What backup we should restore?
+    echo: true
+  register: backup_to_restore
+- name: Test dry-run before proceeding
+  ansible.builtin.shell: "borgmatic extract -n --archive {{ backup_to_restore.user_input }}"
+  args:
+    executable: /bin/bash
+- name: Find all docker-compose directories
+  find:
+    paths: "{{ data_dir }}"
+    recurse: no
+    file_type: directory
+  register: datadir_subdirs
+- name: Shutting down all containers..
+  docker_compose:
+    project_src: '{{ item }}'
+    state: absent
+  with_items: '{{ datadir_subdirs.files | map(attribute="path") | list }}'
+- name: Delete data_dir completely before restore
+  file:
+    state: absent
+    path: "{{ data_dir}}"
+- name: Start restore
+  ansible.builtin.shell: "borgmatic extract --archive {{ backup_to_restore.user_input }} --destination /"
+  args:
+    executable: /bin/bash
+
+- name: Find all docker-compose directories after restore
+  find:
+    paths: "{{ data_dir }}"
+    recurse: no
+    file_type: directory
+  register: datadir_subdirs_after_restore
+- name: Starting all containers..
+  docker_compose:
+    project_src: '{{ item }}'
+  with_items: '{{ datadir_subdirs_after_restore.files | map(attribute="path") | list }}'
+
+

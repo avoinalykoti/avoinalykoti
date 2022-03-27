@@ -1,0 +1,10 @@
+
+
+- hosts: alykoti_server
+  become: true
+  vars_files:
+    - vars/main.yaml
+
+  roles:
+    - borgmatic-restore
+   
