@@ -8,15 +8,11 @@ zerotier:
   network_id: zerotiernetworkid
 data_dir: "/opt/smarthome"
 installation_type: new
-homeassistant:
-  name: HomeSmartHome
-  latitude: 12.345568
-  longitude: 38.232323
-  elevation: 110
 components:
   mosquitto: true
   zerotier: false
   zigbee2mqtt: true
+  esphome: true
   codeserver: true
   btmqttgateway: false
   pihole: true
@@ -25,7 +21,7 @@ components:
   nodered: false
 
 zigbee2mqtt:
-  serial_port: tcp://192.168.20.31:23 # /dev/ttyUSB0 or so
+  serial_port: tcp://192.168.20.31:23 # /dev/ttyUSB0 or tcp://ip:port
   device_type: network # serial or network
 codeserver:
   password: editorsalasana
@@ -36,7 +32,7 @@ postgresql_users:
   password: postgresqltietokantasalasana
 frigate:
   image: blakeblackshear/frigate:stable-amd64
-  edgetpu: pci
+  edgetpu: pci # pci or usb or none
 borg:
   encryption_passphrase: something-here-long-string
   repository: abcdefg@abcdefg.repo.borgbase.com:repo

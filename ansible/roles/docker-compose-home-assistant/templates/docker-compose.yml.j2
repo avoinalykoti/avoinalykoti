@@ -4,17 +4,10 @@ services:
     container_name: home-assistant
     image: homeassistant/home-assistant:latest
     restart: always
-    network: host
+    network_mode: host # to make discovery work, this has to be host
     privileged: true
-    command: [ "python", "-m", "homeassistant", "--config", "/config", "--log-rotate-days", '3' ]
+
     volumes:
       - "{{ data_dir }}/home-assistant/config:/config"
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-    labels:
-      - "traefik.enable=true"
-      - "traefik.docker.network=smarthome"
-      - "traefik.http.routers.home-assistant-secure.entrypoints=websecure"
-      - "traefik.http.routers.home-assistant-secure.rule=Host(`{{ duckdns.domain }}`)"
-      - "traefik.http.routers.home-assistant-secure.service=home-assistant"
-      - "traefik.http.services.home-assistant.loadbalancer.server.port=8123"

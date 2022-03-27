@@ -1,0 +1,23 @@
+# roles/docker-compose-esphome/tasks/main.yaml
+---
+
+- name: Create esphome dir
+  file:
+    path: "{{ data_dir }}/{{item}}"
+    state: directory
+    owner: "{{ ansible_ssh_user }}"
+    group: docker
+    mode: ug+rw,g+s
+  loop:
+   - esphome
+   - esphome/config
+- name: Generate docker-compose.yml
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ data_dir }}/esphome/docker-compose.yml"
+    owner: "{{ ansible_ssh_user }}"
+    group: docker
+    mode: ug+rw
+- name: Deploy esphome
+  docker_compose:
+    project_src: "{{ data_dir }}/esphome"

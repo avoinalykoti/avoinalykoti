@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  esphome:
+    container_name: esphome
+    image: esphome/esphome
+    volumes:
+      - "{{ data_dir }}/esphome/config:/config"
+      - /etc/localtime:/etc/localtime:ro
+    network_mode: host
+    restart: always
+  

@@ -22,3 +22,24 @@
 - name: Deploy home-assistant
   docker_compose:
     project_src: "{{ data_dir }}/home-assistant"
+- name: Wait until home-assistant starts and creates its default configuration.yaml
+  wait_for:
+    path: "{{ data_dir }}/home-assistant/config/configuration.yaml"
+- name: Install HACS
+  raw: "cd {{ data_dir }}/home-assistant/config && wget -O - https://get.hacs.xyz | bash -"
+- name: Add postgresql and proxy configuration
+  blockinfile:
+    path: "{{ data_dir }}/home-assistant/config/configuration.yaml"
+    state: present
+    block: |
+      recorder:
+        db_url: postgresql://{{postgresql_users[0].name}}:{{postgresql_users[0].password}}@{{ ansible_default_ipv4.address }}/{{ postgresql_databases[0].name }}
+        purge_keep_days: 30
+
+      http:
+        use_x_forwarded_for: true
+        trusted_proxies:
+          - 172.16.0.0/12 # docker network
+
+- name: Restart home-assistant
+  raw: "docker restart home-assistant"

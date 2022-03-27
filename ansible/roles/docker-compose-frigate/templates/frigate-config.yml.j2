@@ -1,9 +1,19 @@
 detectors:
+{% if frigate.edgetpu == 'usb' %}
   coral1:
     type: edgetpu
     device: usb
+{% endif %} 
+{% if frigate.edgetpu == 'pci' %}
+  coral1:
+    type: edgetpu
+    device: pci
+{% endif %} 
+{% if frigate.edgetpu == 'none' %}
   cpu1:
     type: cpu
+{% endif %} 
+
 
 mqtt:
   host: {{ ansible_default_ipv4.address }}

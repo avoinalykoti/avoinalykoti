@@ -56,7 +56,7 @@
 
   roles:
     # this role installs m3nu.ansible_role_borgbackup but also inits backup etc
-    - role: smarthome-borgbackup
+    #- role: smarthome-borgbackup
     - { role: install-edgetpu, 
       when: frigate.edgetpu=='pci' }
     - geerlingguy.pip
@@ -91,6 +91,7 @@
     - docker-compose-code-server
     - docker-compose-portainer
     - docker-compose-pi-hole
+    - docker-compose-esphome
 
   tasks:
 #Homebridge begin
@@ -172,7 +173,7 @@
           - "{{ data_dir }}/nodered/:/data"
 #Node-RED end
 
-- name: Final reboot
+- name: Initial backup and final reboot
   hosts: alykoti_server
   become: true
   tasks:

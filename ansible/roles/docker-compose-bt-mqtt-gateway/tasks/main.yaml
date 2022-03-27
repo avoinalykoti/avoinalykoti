@@ -1,4 +1,4 @@
-# roles/docker-compose-zerotier/tasks/main.yaml
+# roles/docker-compose-bt-mqtt-gateway/tasks/main.yaml
 ---
 
 - name: Create bt-mqtt-gateway dir

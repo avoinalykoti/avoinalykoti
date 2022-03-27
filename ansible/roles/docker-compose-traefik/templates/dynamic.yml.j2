@@ -9,6 +9,31 @@ http:
         stsPreload: true
         stsSeconds: 31536000
 
+  # services, which are using host networking, has to be defined here
+  routers:
+    home-assistant:
+      rule: "Host(`{{ duckdns.domain }}`)"
+      service: home-assistant
+      entrypoints:
+        - websecure
+
+    esphome:
+      rule: "Host(`esphome.{{ duckdns.domain }}`)"
+      service: esphome
+      entrypoints:
+        - websecure
+
+  services:
+
+    home-assistant:
+      loadBalancer:
+        servers:
+          - url: "http://{{ ansible_default_ipv4.address }}:8123"
+    esphome:
+      loadBalancer:
+        servers:
+          - url: "http://{{ ansible_default_ipv4.address }}:6052"
+
 tls:
   options:
     default:
@@ -20,3 +45,4 @@ tls:
         - TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305
         - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305
       minVersion: VersionTLS12
+
